@@ -39,16 +39,16 @@ parallel {
 
 ## Документация
 
-- [docs/01-overview.md](docs/01-overview.md) — обзор: цели, философия (10 принципов), модель обучения
-- [docs/02-syntax.md](docs/02-syntax.md) — синтаксис: ключевые слова, переменные, функции, условия, циклы, зоны
-- [docs/03-data-model.md](docs/03-data-model.md) — модель данных: копия, ссылки, databox
-- [docs/04-memory.md](docs/04-memory.md) — память: автоматическое управление, move/копия
-- [docs/05-references.md](docs/05-references.md) — проверка ссылок: три правила, CFG, формат ошибок
-- [docs/06-parallelism.md](docs/06-parallelism.md) — параллелизм: `parallel { ... }`, граф зависимостей
-- [docs/07-functions.md](docs/07-functions.md) — функции: контракт, мутация, функции как значения
-- [docs/08-types.md](docs/08-types.md) — типы: статические, модификаторы `int:id` / `int:=id`
-- [docs/09-modules.md](docs/09-modules.md) — модули: `use std`, `link file`, области видимости
-- [docs/10-errors.md](docs/10-errors.md) — обработка ошибок: `try`, `defer`, режимы ошибок
-- [docs/11-compiler.md](docs/11-compiler.md) — компилятор: Cranelift, IR (SSA), плоский AST
-- [docs/12-future.md](docs/12-future.md) — идеи на будущее: JIT, comptime, self-hosting
-- [docs/13-status.md](docs/13-status.md) — статус: концепция завершена, дальше — реализация
+- [docs/ru/01-overview.md](docs/ru/01-overview.md) — обзор: цели, философия (10 принципов), модель обучения
+- [docs/ru/02-syntax.md](docs/ru/02-syntax.md) — синтаксис: ключевые слова, переменные, функции, условия, циклы, зоны
+- [docs/ru/03-data-model.md](docs/ru/03-data-model.md) — модель данных: копия, ссылки, databox, контракты операций
+- [docs/ru/04-memory.md](docs/ru/04-memory.md) — память: автоматическое управление, move/копия
+- [docs/ru/05-references.md](docs/ru/05-references.md) — проверка ссылок: три правила, CFG, формат ошибок
+- [docs/ru/06-parallelism.md](docs/ru/06-parallelism.md) — параллелизм: `parallel { ... }`, граф зависимостей
+- [docs/ru/07-functions.md](docs/ru/07-functions.md) — функции: контракт, мутация, функции как значения
+- [docs/ru/08-types.md](docs/ru/08-types.md) — типы: статические, модификаторы `int:id` / `int:=id`
+- [docs/ru/09-modules.md](docs/ru/09-modules.md) — модули: `use std`, `link file`, области видимости
+- [docs/ru/10-errors.md](docs/ru/10-errors.md) — обработка ошибок: `try`, `defer`, режимы ошибок
+- [docs/ru/11-compiler.md](docs/ru/11-compiler.md) — компилятор: Cranelift, IR (SSA), плоский AST
+- [docs/ru/12-future.md](docs/ru/12-future.md) — идеи на будущее: JIT, comptime, self-hosting
+- [docs/ru/13-status.md](docs/ru/13-status.md) — статус: концепция завершена, дальше — реализация
