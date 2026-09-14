@@ -52,3 +52,4 @@ parallel {
 - [docs/ru/11-compiler.md](docs/ru/11-compiler.md) — компилятор: Cranelift, IR (SSA), плоский AST
 - [docs/ru/12-future.md](docs/ru/12-future.md) — идеи на будущее: JIT, comptime, self-hosting
 - [docs/ru/13-status.md](docs/ru/13-status.md) — статус: концепция завершена, дальше — реализация
+- [docs/ru/14-examples.md](docs/ru/14-examples.md) — примеры: калькулятор и парсер рекурсивного спуска с разбором по шагам
