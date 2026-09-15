@@ -9,7 +9,7 @@ fn name(params) -> type { ... }
 `fn` сам создаёт функцию — без `let`. Параметры с типами:
 
 ```text
-fn sum(a: int, b: int) -> int {
+fn sum(databox a: int, databox b: int) -> int {
     a + b
 }
 ```
@@ -22,8 +22,8 @@ fn sum(a: int, b: int) -> int {
 - потребляющий параметр — `databox` (компилятор решает копия или move по числу использований у вызывающего).
 
 ```text
-fn read(link data: Data) { ... }        # чтение
-fn consume(databox data: Data) { ... }  # потребление
+fn.nothing read(link data: Data) { ... }        # чтение
+fn.nothing consume(databox data: Data) { ... }  # потребление
 ```
 
 На вызове контракт соблюдается явно:
@@ -34,6 +34,24 @@ consume(databox(a))        # параметр databox — на вызове пи
 ```
 
 Сигнатура показывает, что писать на вызове: потребляющий параметр требует `databox` в месте вызова.
+
+Голых параметров не бывает: каждый параметр обязан быть помечен `link` (чтение) или `databox` (потребление). Если параметров несколько — на вызове один `databox`: `sum(databox(x, y))`.
+
+Параметр `link` — терминальный вид: функция читает данные напрямую и не передаёт ссылку в другую функцию, принимающую ссылку. Нужно передать данные глубже — через `databox`.
+
+## Два вида функций
+
+- `fn name(...) -> T` — отдаёт ответ наружу. Ответ обязан быть потреблён: использован или явно отправлен в мусорку (`let delete.trash = ...`).
+- `fn.nothing name(...)` (синоним `fn.nil`) — отдаёт ответ НИЧЕГО. Вызывается как оператор, потреблять нечего.
+
+```text
+fn sum(databox a: int, databox b: int) -> int { a + b }      # ответ обязан быть потреблён
+fn.nothing print(link x: int) { ... }             # ответ НИЧЕГО, вызов как оператор
+
+let r = sum(databox(3, 5))               # ответ потреблён
+let delete.trash = sum(databox(3, 5))    # ответ задушен явно
+print(r)                                # fn.nothing — оператор
+```
 
 ## Копия от переменной с данными, не через ссылку
 
@@ -82,5 +100,5 @@ fn apply(link f: Fn, databox value: int) -> int {
     f(value)
 }
 
-let result = apply(my_func, 42)
+let result = apply(my_func, databox(42))
 ```

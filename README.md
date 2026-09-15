@@ -24,11 +24,11 @@
 let x = 10                # копия: независимое значение
 link view = x             # ссылка: чтение, умирает при mut x
 
-fn sum(a: int, b: int) -> int {
+fn sum(databox a: int, databox b: int) -> int {
     a + b
 }
 
-let result = sum(databox(x), databox(y))   # использование: компилятор решает копия или move
+let result = sum(databox(x, y))   # использование: компилятор решает копия или move
 
 parallel {
     let data = load_data()
