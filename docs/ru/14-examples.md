@@ -13,7 +13,7 @@ use std
 
 --- типы
 
-let TokenKind = enum {
+enum TokenKind {
     Num,
     Add,
     Sub,
@@ -21,14 +21,14 @@ let TokenKind = enum {
     Div,
 }
 
-let Token = struct {
+struct Token {
     kind: TokenKind,
     value: int,
 }
 
 --- ошибки
 
-let CalcError = enum {
+enum CalcError {
     UnexpectedChar,
     DivByZero,
     BadExpr,
@@ -177,16 +177,16 @@ use std
 
 --- типы
 
-let TokenKind = enum { Num, Add, Sub, Mul, Div, LParen, RParen, Eof }
+enum TokenKind { Num, Add, Sub, Mul, Div, LParen, RParen, Eof }
 
-let Token = struct {
+struct Token {
     kind: TokenKind,
     value: int,
 }
 
-let NodeKind = enum { Num, Bin, Neg }
+enum NodeKind { Num, Bin, Neg }
 
-let Node = struct {
+struct Node {
     kind: NodeKind,
     op: TokenKind,
     value: int,
@@ -194,13 +194,13 @@ let Node = struct {
     right: int,
 }
 
-let Parser = struct {
+struct Parser {
     tokens: [Token],
     nodes: [Node],
     pos: int,
 }
 
-let ParseError = enum {
+enum ParseError {
     UnexpectedChar,
     UnexpectedToken,
     UnexpectedEof,
