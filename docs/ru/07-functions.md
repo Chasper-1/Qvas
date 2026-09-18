@@ -9,7 +9,7 @@ fn name(params) -> type { ... }
 `fn` сам создаёт функцию — без `let`. Параметры с типами:
 
 ```text
-fn sum(databox a: int, databox b: int) -> int {
+fn sum(box a: int, box b: int) -> int {
     a + b
 }
 ```
@@ -19,25 +19,25 @@ fn sum(databox a: int, databox b: int) -> int {
 Параметры объявляют, читают они или потребляют. Видно в сигнатуре:
 
 - читающий параметр — `link` (ссылка);
-- потребляющий параметр — `databox` (компилятор решает копия или move по числу использований у вызывающего).
+- потребляющий параметр — `box` (компилятор решает копия или move по числу использований у вызывающего).
 
 ```text
 fn.nothing read(link data: Data) { ... }        # чтение
-fn.nothing consume(databox data: Data) { ... }  # потребление
+fn.nothing consume(box data: Data) { ... }  # потребление
 ```
 
 На вызове контракт соблюдается явно:
 
 ```text
-read(a)                    # параметр link — передаётся ссылка, databox не нужен
-consume(databox(a))        # параметр databox — на вызове пишется databox
+read(a)                    # параметр link — передаётся ссылка, box не нужен
+consume(box(a))        # параметр box — на вызове пишется box
 ```
 
-Сигнатура показывает, что писать на вызове: потребляющий параметр требует `databox` в месте вызова.
+Сигнатура показывает, что писать на вызове: потребляющий параметр требует `box` в месте вызова.
 
-Голых параметров не бывает: каждый параметр обязан быть помечен `link` (чтение) или `databox` (потребление). Если параметров несколько — на вызове один `databox`: `sum(databox(x, y))`.
+Голых параметров не бывает: каждый параметр обязан быть помечен `link` (чтение) или `box` (потребление). Если параметров несколько — на вызове один `box`: `sum(box(x, y))`.
 
-Параметр `link` — терминальный вид: функция читает данные напрямую и не передаёт ссылку в другую функцию, принимающую ссылку. Нужно передать данные глубже — через `databox`.
+Параметр `link` — терминальный вид: функция читает данные напрямую и не передаёт ссылку в другую функцию, принимающую ссылку. Нужно передать данные глубже — через `box`.
 
 ## Два вида функций
 
@@ -45,11 +45,11 @@ consume(databox(a))        # параметр databox — на вызове пи
 - `fn.nothing name(...)` (синоним `fn.nil`) — отдаёт ответ НИЧЕГО. Вызывается как оператор, потреблять нечего.
 
 ```text
-fn sum(databox a: int, databox b: int) -> int { a + b }      # ответ обязан быть потреблён
+fn sum(box a: int, box b: int) -> int { a + b }      # ответ обязан быть потреблён
 fn.nothing print(link x: int) { ... }             # ответ НИЧЕГО, вызов как оператор
 
-let r = sum(databox(3, 5))               # ответ потреблён
-let delete.trash = sum(databox(3, 5))    # ответ задушен явно
+let r = sum(box(3, 5))               # ответ потреблён
+let delete.trash = sum(box(3, 5))    # ответ задушен явно
 print(r)                                # fn.nothing — оператор
 ```
 
@@ -79,7 +79,7 @@ fn make() -> Data {
 Данные пришли (потребление), поменялись через `mut`, вернулись (return = передача):
 
 ```text
-fn process(databox data: Data) -> Data {
+fn process(box data: Data) -> Data {
     mut data.field = new_value
     data
 }
@@ -96,9 +96,9 @@ fn process(databox data: Data) -> Data {
 Функцию можно передать в функцию — как везде:
 
 ```text
-fn apply(link f: Fn, databox value: int) -> int {
+fn apply(link f: Fn, box value: int) -> int {
     f(value)
 }
 
-let result = apply(my_func, databox(42))
+let result = apply(my_func, box(42))
 ```
