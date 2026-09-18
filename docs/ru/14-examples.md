@@ -88,8 +88,8 @@ fn eval(link tokens: [Token]) -> int or CalcError {
             continue
         }
 
-        let b = stack.pop()
-        let a = stack.pop()
+        let b = mut stack.pop()
+        let a = mut stack.pop()
 
         if token.kind == TokenKind.Div and b == 0 {
             return CalcError::DivByZero
@@ -115,8 +115,8 @@ fn eval(link tokens: [Token]) -> int or CalcError {
 
 fn.nothing main() {
     let input = "3 4 + 2 *"
-    let tokens = tokenize(input)?
-    let result = eval(tokens)?
+    let tokens = tokenize(input)
+    let result = eval(tokens)
     std.print(result)
 }
 ```
@@ -160,8 +160,8 @@ fn.nothing main() {
 
 **Зона `--- точка входа`** — `fn.nothing main()`:
 - `let input = "3 4 + 2 *"` — выражение.
-- `let tokens = tokenize(input)?` — лексер. `?` пробрасывает ошибку, если она будет.
-- `let result = eval(tokens)?` — вычисление. `eval` читает `tokens` через `link` — передача без `databox`.
+- `let tokens = tokenize(input)` — лексер. 
+- `let result = eval(tokens)` — вычисление. `eval` читает `tokens` через `link` — передача без `databox`.
 - `std.print(result)` — вывод. `print` — `fn.nothing`: ответ НИЧЕГО, вызов как оператор.
 
 **Поток данных:** `main` → `tokenize` (строка → токены) → `eval` (токены → число) → `print`. Каждая функция делает одно дело, ошибки пробрасываются через `?`, контракты видны в сигнатурах.
@@ -345,7 +345,7 @@ fn parse(databox input: str) -> (int, [Node]) or ParseError {
 }
 
 fn.nothing main() {
-    let (root, nodes) = parse("3 + 4 * (2 - 1)")?
+    let (root, nodes) = parse(databox("3 + 4 * (2 - 1)"))
     std.print(root)
     std.print(nodes.len)
 }
@@ -388,7 +388,7 @@ fn.nothing main() {
   - `let last = peek(p1)` — после выражения должен быть `Eof`, иначе в выражении лишние токены.
   - `(root, p1.nodes)` — возврат: индекс корня + вся арена узлов.
 - `fn.nothing main()`:
-  - `let (root, nodes) = parse("3 + 4 * (2 - 1)")?` — разбор.
+  - `let (root, nodes) = parse(databox("3 + 4 * (2 - 1)"))` — разбор.
   - `std.print(root)` — индекс корневого узла.
   - `std.print(nodes.len)` — сколько узлов в арене.
 

@@ -45,7 +45,7 @@ fn name(params) -> type { ... }
 Параметры с типами:
 
 ```text
-fn sum(a: int, b: int) -> int {
+fn sum(databox a: int, databox b: int) -> int {
     a + b
 }
 ```

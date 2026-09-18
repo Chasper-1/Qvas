@@ -22,6 +22,7 @@
 
 ```text
 let x = 10                # копия: независимое значение
+let y = 20
 link view = x             # ссылка: чтение, умирает при mut x
 
 fn sum(databox a: int, databox b: int) -> int {
