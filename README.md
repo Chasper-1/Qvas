@@ -49,7 +49,7 @@ parallel {
 - [docs/ru/07-functions.md](docs/ru/07-functions.md) — функции: контракт, мутация, функции как значения
 - [docs/ru/08-types.md](docs/ru/08-types.md) — типы: статические, модификаторы `int:id` / `int:=id`
 - [docs/ru/09-modules.md](docs/ru/09-modules.md) — модули: `use std`, `link file`, области видимости
-- [docs/ru/10-errors.md](docs/ru/10-errors.md) — обработка ошибок: `try`, `defer`, режимы ошибок
+- [docs/ru/10-errors.md](docs/ru/10-errors.md) — обработка ошибок: `?`, `defer`, режимы ошибок
 - [docs/ru/11-compiler.md](docs/ru/11-compiler.md) — компилятор: Cranelift, IR (SSA), плоский AST
 - [docs/ru/12-future.md](docs/ru/12-future.md) — идеи на будущее: JIT, comptime, self-hosting
 - [docs/ru/13-status.md](docs/ru/13-status.md) — статус: концепция завершена, дальше — реализация
