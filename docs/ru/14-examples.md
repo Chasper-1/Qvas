@@ -116,8 +116,17 @@ fn eval(link tokens: [Token]) -> int or CalcError {
 fn.nothing main() {
     let input = "3 4 + 2 *"
     let tokens = tokenize(input)
-    let result = eval(tokens)
-    std.print(result)
+    switch tokens {
+        CalcError::UnexpectedChar => std.print("неизвестный символ"),
+        else => {
+            let result = eval(tokens)
+            switch result {
+                CalcError::DivByZero => std.print("деление на ноль"),
+                CalcError::BadExpr => std.print("неверное выражение"),
+                else => std.print(result),
+            }
+        }
+    }
 }
 ```
 
@@ -160,11 +169,13 @@ fn.nothing main() {
 
 **Зона `--- точка входа`** — `fn.nothing main()`:
 - `let input = "3 4 + 2 *"` — выражение.
-- `let tokens = tokenize(input)` — лексер. 
+- `let tokens = tokenize(input)` — лексер. `tokenize` возвращает `[Token] or CalcError`.
+- `switch tokens { ... }` — обработка ошибки лексера: `CalcError::UnexpectedChar` — неизвестный символ; `else` — успех, `tokens` — список токенов.
 - `let result = eval(tokens)` — вычисление. `eval` читает `tokens` через `link` — передача без `box`.
+- `switch result { ... }` — обработка ошибки вычисления: `CalcError::DivByZero` — деление на ноль; `CalcError::BadExpr` — неверное выражение; `else` — успех, `result` — число.
 - `std.print(result)` — вывод. `print` — `fn.nothing`: ответ НИЧЕГО, вызов как оператор.
 
-**Поток данных:** `main` → `tokenize` (строка → токены) → `eval` (токены → число) → `print`. Каждая функция делает одно дело, ошибки пробрасываются через `?`, контракты видны в сигнатурах.
+**Поток данных:** `main` → `tokenize` (строка → токены) → `eval` (токены → число) → `print`. Каждая функция делает одно дело, ошибки возвращаются явно и обрабатываются в `main` через `switch`, контракты видны в сигнатурах.
 
 ---
 
@@ -345,9 +356,18 @@ fn parse(box input: str) -> (int, [Node]) or ParseError {
 }
 
 fn.nothing main() {
-    let (root, nodes) = parse(box("3 + 4 * (2 - 1)"))
-    std.print(root)
-    std.print(nodes.len)
+    let result = parse(box("3 + 4 * (2 - 1)"))
+    switch result {
+        ParseError::UnexpectedChar => std.print("неизвестный символ"),
+        ParseError::UnexpectedToken => std.print("неожиданный токен"),
+        ParseError::UnexpectedEof => std.print("неожиданный конец"),
+        ParseError::BadExpr => std.print("неверное выражение"),
+        else => {
+            let (root, nodes) = result
+            std.print(root)
+            std.print(nodes.len)
+        }
+    }
 }
 ```
 
@@ -388,7 +408,9 @@ fn.nothing main() {
   - `let last = peek(p1)` — после выражения должен быть `Eof`, иначе в выражении лишние токены.
   - `(root, p1.nodes)` — возврат: индекс корня + вся арена узлов.
 - `fn.nothing main()`:
-  - `let (root, nodes) = parse(box("3 + 4 * (2 - 1)"))` — разбор.
+  - `let result = parse(box("3 + 4 * (2 - 1)"))` — разбор. `parse` возвращает `(int, [Node]) or ParseError`.
+  - `switch result { ... }` — обработка ошибок: каждый вариант `ParseError` — своё сообщение; `else` — успех, `result` — кортеж `(int, [Node])`.
+  - `let (root, nodes) = result` — разбор кортежа: индекс корневого узла и арена узлов.
   - `std.print(root)` — индекс корневого узла.
   - `std.print(nodes.len)` — сколько узлов в арене.
 
@@ -402,14 +424,14 @@ fn.nothing main() {
 |---|---|---|
 | `use std` | оба | импорт модуля, доступ к `std.print()` |
 | `--- зона` | оба | структура файла: типы / ошибки / лексер / вычисление / точка входа |
-| `let X = enum { ... }` | оба | создание enum (виды токенов, узлов, ошибок) |
-| `let X = struct { ... }` | оба | создание структуры (токен, узел, парсер) |
+| `enum X { ... }` | оба | создание enum (виды токенов, узлов, ошибок) |
+| `struct X { ... }` | оба | создание структуры (токен, узел, парсер) |
 | `fn name(params) -> T or E` | оба | функция, возвращающая значение или ошибку |
 | `fn.nothing name(params)` | оба | функция, отдающая ответ НИЧЕГО (`main`, `print`, `push`) |
 | `link param: T` | оба | параметр-ссылка: функция читает, не потребляет |
 | `box param: T` | пример 2 | потребляющий параметр: компилятор решает копия/move. На вызове один `box(x, y)` на все потребляющие аргументы |
 | `[T]` | оба | список (токены, стек, арена узлов) |
-| `expr?` | оба | проброс ошибки одной командой |
+| `expr?` | пример 2 | проброс ошибки одной командой |
 | `return Error::Variant` | оба | возврат ошибки |
 | `switch x { ... }` | оба | switch-выражение (выдаёт значение), `else` — ветка по умолчанию |
 | `mut x += 1` | оба | мутация: событие изменения |

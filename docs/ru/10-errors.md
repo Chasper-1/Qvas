@@ -16,7 +16,7 @@
 Ошибка — обычное значение. Что именно — решает программист:
 
 ```text
-let FileError = enum {
+enum FileError {
     NotFound,
     PermissionDenied,
 }

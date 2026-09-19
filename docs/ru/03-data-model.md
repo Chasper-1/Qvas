@@ -38,7 +38,7 @@ let sum = box(a + b)
 - 2+ использования → копии, чистого move не будет.
 
 ```text
-let result = add(a, b)                    # чтение — ссылки, без box
+let result = add(a, b)                # чтение — ссылки, без box
 let result = add(box(a, b))           # использование — box
 ```
 
