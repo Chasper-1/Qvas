@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = [
+    "qvas-lexer",
+    "qvas-parser",
+    "qvas-frontend",
+    "qvas-backend-aot",
+    "qvas-backend-jit",
+    "qvas-backend-comptime",
+    "qvas-cli",
+    "qvas-pkg",
+]
