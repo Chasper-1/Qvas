@@ -34,7 +34,7 @@ fn read_file() -> Data or FileError {
 
 ```text
 fn read_file() -> Data or FileError {
-    let data = open(path)?    # проброс ошибки одной командой
+    let data = open(path)?    // проброс ошибки одной командой
     data
 }
 ```

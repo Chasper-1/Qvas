@@ -22,15 +22,15 @@ fn sum(box a: int, box b: int) -> int {
 - потребляющий параметр — `box` (компилятор решает копия или move по числу использований у вызывающего).
 
 ```text
-fn.nothing read(link data: Data) { ... }        # чтение
-fn.nothing consume(box data: Data) { ... }  # потребление
+fn.nothing read(link data: Data) { ... }        // чтение
+fn.nothing consume(box data: Data) { ... }  // потребление
 ```
 
 На вызове контракт соблюдается явно:
 
 ```text
-read(a)                    # параметр link — передаётся ссылка, box не нужен
-consume(box(a))        # параметр box — на вызове пишется box
+read(a)                    // параметр link — передаётся ссылка, box не нужен
+consume(box(a))        // параметр box — на вызове пишется box
 ```
 
 Сигнатура показывает, что писать на вызове: потребляющий параметр требует `box` в месте вызова.
@@ -45,12 +45,12 @@ consume(box(a))        # параметр box — на вызове пишетс
 - `fn.nothing name(...)` (синоним `fn.nil`) — отдаёт ответ НИЧЕГО. Вызывается как оператор, потреблять нечего.
 
 ```text
-fn sum(box a: int, box b: int) -> int { a + b }      # ответ обязан быть потреблён
-fn.nothing print(link x: int) { ... }             # ответ НИЧЕГО, вызов как оператор
+fn sum(box a: int, box b: int) -> int { a + b }      // ответ обязан быть потреблён
+fn.nothing print(link x: int) { ... }             // ответ НИЧЕГО, вызов как оператор
 
-let r = sum(box(3, 5))               # ответ потреблён
-let delete.trash = sum(box(3, 5))    # ответ задушен явно
-print(r)                                # fn.nothing — оператор
+let r = sum(box(3, 5))               // ответ потреблён
+let delete.trash = sum(box(3, 5))    // ответ задушен явно
+print(r)                                // fn.nothing — оператор
 ```
 
 ## Копия от переменной с данными, не через ссылку

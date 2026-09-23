@@ -21,15 +21,15 @@
 ## Пример
 
 ```text
-let x = 10                # копия: независимое значение
+let x = 10                // копия: независимое значение
 let y = 20
-link view = x             # ссылка: чтение, умирает при mut x
+link view = x             // ссылка: чтение, умирает при mut x
 
 fn sum(box a: int, box b: int) -> int {
     a + b
 }
 
-let result = sum(box(x, y))   # использование: компилятор решает копия или move
+let result = sum(box(x, y))   // использование: компилятор решает копия или move
 
 parallel {
     let data = load_data()
