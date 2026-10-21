@@ -21,9 +21,9 @@ enum TokenKind {
     Div,
 }
 
-struct Token {
-    kind: TokenKind,
-    value: i32,
+struct Token box {
+    kind,
+    value,
 }
 
 --- ошибки
@@ -74,7 +74,12 @@ fn tokenize(link input: str) -> [Token] or CalcError {
                 mut num = num * 10 + digit_value(input[i])
                 mut i += 1
             }
-            mut tokens.push(Token { kind: TokenKind.Num, value: num })
+            let kind = TokenKind.Num
+            let value = num
+            mut tokens.push(struct Token box {
+                kind,
+                value,
+            })
             continue
         }
 
@@ -85,8 +90,12 @@ fn tokenize(link input: str) -> [Token] or CalcError {
             "/" => TokenKind.Div,
             else => return CalcError::UnexpectedChar,
         }
+        let value = 0
 
-        mut tokens.push(Token { kind: kind, value: 0 })
+        mut tokens.push(struct Token box {
+            kind,
+            value,
+        })
         mut i += 1
     }
 
@@ -212,25 +221,25 @@ use std
 
 enum TokenKind { Num, Add, Minus, Mul, Div, LParen, RParen, Eof }
 
-struct Token {
-    kind: TokenKind,
-    value: i32,
+struct Token box {
+    kind,
+    value,
 }
 
 enum NodeKind { Num, Bin, Neg }
 
-struct Node {
-    kind: NodeKind,
-    op: TokenKind,
-    value: i32,
-    left: i32,
-    right: i32,
+struct Node box {
+    kind,
+    op,
+    value,
+    left,
+    right,
 }
 
-struct Parser {
-    tokens: [Token],
-    nodes: [Node],
-    pos: i32,
+struct Parser box {
+    tokens,
+    nodes,
+    pos,
 }
 
 enum ParseError {
@@ -277,7 +286,12 @@ fn lex(link input: str) -> [Token] or ParseError {
                 mut num = num * 10 + digit_value(input[i])
                 mut i += 1
             }
-            mut tokens.push(Token { kind: TokenKind.Num, value: num })
+            let kind = TokenKind.Num
+            let value = num
+            mut tokens.push(struct Token box {
+                kind,
+                value,
+            })
             continue
         }
 
@@ -290,12 +304,21 @@ fn lex(link input: str) -> [Token] or ParseError {
             ")" => TokenKind.RParen,
             else => return ParseError::BadExpr,
         }
+        let value = 0
 
-        mut tokens.push(Token { kind: kind, value: 0 })
+        mut tokens.push(struct Token box {
+            kind,
+            value,
+        })
         mut i += 1
     }
 
-    mut tokens.push(Token { kind: TokenKind.Eof, value: 0 })
+    let kind = TokenKind.Eof
+    let value = 0
+    mut tokens.push(struct Token box {
+        kind,
+        value,
+    })
     tokens
 }
 
@@ -324,7 +347,19 @@ fn parse_factor(box p: Parser) -> (i32, Parser) or ParseError {
     switch tok.kind {
         Num => {
             let p1 = advance(box(p))
-            emit(box(p1, Node { kind: NodeKind.Num, op: Num, value: tok.value, left: -1, right: -1 }))
+            let kind = NodeKind.Num
+            let op = Num
+            let value = tok.value
+            let left = -1
+            let right = -1
+            let node = struct Node box {
+                kind,
+                op,
+                value,
+                left,
+                right,
+            }
+            emit(box(p1, node))
         },
         Minus => {
             let p1 = advance(box(p))
@@ -333,7 +368,19 @@ fn parse_factor(box p: Parser) -> (i32, Parser) or ParseError {
                 ParseError::BadExpr => return ParseError::BadExpr,
                 else => r,
             }
-            emit(box(p2, Node { kind: NodeKind.Neg, op: Minus, value: 0, left: operand, right: -1 }))
+            let kind = NodeKind.Neg
+            let op = Minus
+            let value = 0
+            let left = operand
+            let right = -1
+            let node = struct Node box {
+                kind,
+                op,
+                value,
+                left,
+                right,
+            }
+            emit(box(p2, node))
         },
         LParen => {
             let p1 = advance(box(p))
@@ -373,7 +420,17 @@ fn term_tail(box left: i32, box p: Parser) -> (i32, Parser) or ParseError {
         ParseError::BadExpr => return ParseError::BadExpr,
         else => r,
     }
-    let (idx, p3) = emit(box(p2, Node { kind: NodeKind.Bin, op: tok.kind, value: 0, left: left, right: right }))
+    let kind = NodeKind.Bin
+    let op = tok.kind
+    let value = 0
+    let node = struct Node box {
+        kind,
+        op,
+        value,
+        left,
+        right,
+    }
+    let (idx, p3) = emit(box(p2, node))
     term_tail(box(idx, p3))
 }
 
@@ -397,7 +454,17 @@ fn expr_tail(box left: i32, box p: Parser) -> (i32, Parser) or ParseError {
         ParseError::BadExpr => return ParseError::BadExpr,
         else => r,
     }
-    let (idx, p3) = emit(box(p2, Node { kind: NodeKind.Bin, op: tok.kind, value: 0, left: left, right: right }))
+    let kind = NodeKind.Bin
+    let op = tok.kind
+    let value = 0
+    let node = struct Node box {
+        kind,
+        op,
+        value,
+        left,
+        right,
+    }
+    let (idx, p3) = emit(box(p2, node))
     expr_tail(box(idx, p3))
 }
 
@@ -409,7 +476,13 @@ fn parse(box input: str) -> (i32, [Node]) or ParseError {
         ParseError::BadExpr => return ParseError::BadExpr,
         else => tokens_result,
     }
-    let p = Parser { tokens: tokens, nodes: {}, pos: 0 }
+    let nodes = {}
+    let pos = 0
+    let p = struct Parser box {
+        tokens,
+        nodes,
+        pos,
+    }
     let root_result = parse_expr(box(p))
     let (root, p1) = switch root_result {
         ParseError::BadExpr => return ParseError::BadExpr,
@@ -467,7 +540,7 @@ sub main() {
 **Зона `--- точка входа`**:
 - `fn parse(box input: str) -> (i32, [Node]) or ParseError`:
   - `let tokens_result = lex(input)` — лексер. `parse` потребляет строку через `box`; `lex` читает `input` напрямую и не возвращает ссылку — результат собственный список токенов. Ошибка сразу разбирается через `switch`.
-  - `let p = Parser { tokens: tokens, nodes: {}, pos: 0 }` — начальное состояние парсера.
+  - `let p = struct Parser box { tokens, nodes, pos }` — начальное состояние парсера.
   - `let root_result = parse_expr(box(p))` — разбор всего выражения; результат сразу разбирается через `switch`. `root` — индекс корневого узла в арене.
   - `let last = peek(p1)` — после выражения должен быть `Eof`, иначе в выражении лишние токены.
   - `(root, p1.nodes)` — возврат: индекс корня + вся арена узлов.
@@ -489,7 +562,7 @@ sub main() {
 | `use std` | оба | импорт модуля, доступ к `std.print()` |
 | `--- зона` | оба | структура файла: типы / ошибки / лексер / вычисление / точка входа |
 | `enum X { ... }` | оба | создание enum (виды токенов, узлов, ошибок) |
-| `struct X { ... }` | оба | создание структуры (токен, узел, парсер) |
+| `struct X box { ... }` | оба | создание структуры (токен, узел, парсер) |
 | `fn name(params) -> T or E` | оба | вычисление: отдаёт значение или ошибку, ответ обязателен |
 | `sub name(params)` | оба | действие: ответа нет (`main`, `print`, `push`) |
 | `link param: T` | оба | параметр-ссылка: вычисление или действие читает, не потребляет |
@@ -502,7 +575,7 @@ sub main() {
 | `for item in list` | пример 1 | итерация: `item` — ссылка на элемент |
 | `a[i]` | оба | чтение по индексу (ссылка) |
 | `a.len` | оба | чтение длины (контракт: длина читает) |
-| `Token { kind: ..., value: ... }` | оба | создание структуры |
+| `struct Token box { kind, value }` | оба | создание структуры |
 | `(i32, Parser)` | пример 2 | кортеж: несколько возвращаемых значений |
 | неявный возврат последнего выражения | оба | `tokens`, `stack[0]`, `(idx, p)` |
 | `std.print()` | оба | вызов действия из std |
