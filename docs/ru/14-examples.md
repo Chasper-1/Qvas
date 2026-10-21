@@ -36,8 +36,24 @@ enum CalcError {
 
 --- лексер
 
-fn is_digit(link c: u8) -> bool {
-    c >= '0' and c <= '9'
+fn digit_value(link c: str) -> i32 {
+    switch c {
+        "0" => 0,
+        "1" => 1,
+        "2" => 2,
+        "3" => 3,
+        "4" => 4,
+        "5" => 5,
+        "6" => 6,
+        "7" => 7,
+        "8" => 8,
+        "9" => 9,
+        else => -1,
+    }
+}
+
+fn is_digit(link c: str) -> bool {
+    digit_value(c) >= 0
 }
 
 fn tokenize(link input: str) -> [Token] or CalcError {
@@ -47,7 +63,7 @@ fn tokenize(link input: str) -> [Token] or CalcError {
     while i < input.len {
         let c = input[i]
 
-        if c == ' ' {
+        if c == " " {
             mut i += 1
             continue
         }
@@ -55,7 +71,7 @@ fn tokenize(link input: str) -> [Token] or CalcError {
         if is_digit(c) {
             let num = 0
             while i < input.len and is_digit(input[i]) {
-                mut num = num * 10 + (input[i] - '0')
+                mut num = num * 10 + digit_value(input[i])
                 mut i += 1
             }
             mut tokens.push(Token { kind: TokenKind.Num, value: num })
@@ -63,10 +79,10 @@ fn tokenize(link input: str) -> [Token] or CalcError {
         }
 
         let kind = switch c {
-            '+' => TokenKind.Add,
-            '-' => TokenKind.Minus,
-            '*' => TokenKind.Mul,
-            '/' => TokenKind.Div,
+            "+" => TokenKind.Add,
+            "-" => TokenKind.Minus,
+            "*" => TokenKind.Mul,
+            "/" => TokenKind.Div,
             else => return CalcError::UnexpectedChar,
         }
 
@@ -145,16 +161,17 @@ sub main() {
 **Зона `--- ошибки`** — `CalcError` — enum возможных ошибок. Вычисления будут возвращать «значение или ошибку».
 
 **Зона `--- лексер`** — превращает строку в список токенов:
-- `fn is_digit(link c: u8) -> bool` — проверка, цифра ли символ. Параметр `c` — ссылка, вычисление его только читает.
+- `fn digit_value(link c: str) -> i32` — значение цифры: `"0"` → 0, …, `"9"` → 9, иначе -1.
+- `fn is_digit(link c: str) -> bool` — проверка, цифра ли символ: `digit_value(c) >= 0`. Параметр `c` — ссылка, вычисление его только читает.
 - `fn tokenize(link input: str) -> [Token] or CalcError`:
   - `link input: str` — параметр-ссылка: вычисление **читает** строку, не потребляет. Вызывающий может передать строку без `box`.
   - `[Token] or CalcError` — ответ: список токенов **или** ошибка. Ошибку обрабатывает вызывающий через `switch`.
   - `let tokens: [Token] = {}` — создаём пустой список.
   - `while i < input.len` — цикл по строке. `input.len` — чтение длины (контракт: длина читает).
-  - `let c = input[i]` — чтение символа по индексу (контракт: `a[0]` читает), `c` — копия символа.
-  - `if c == ' '` — сравнение (читает). Пробел пропускаем: `mut i += 1` — мутация счётчика, `continue`.
+  - `let c = input[i]` — чтение символа по индексу (контракт: `a[0]` читает), `c` — `str` из одного символа.
+  - `if c == " "` — сравнение (читает). Пробел пропускаем: `mut i += 1` — мутация счётчика, `continue`.
   - `if is_digit(c)` — вызов вычисления (читает). Если цифра — собираем число:
-    - `mut num = num * 10 + (input[i] - '0')` — арифметика **потребляет** значения и создаёт новое; `mut` — событие изменения `num`.
+    - `mut num = num * 10 + digit_value(input[i])` — `digit_value` превращает символ в число; `mut` — событие изменения `num`.
     - `mut tokens.push(...)` — `push` **потребляет** значение (box), `mut` — событие изменения списка.
   - `switch c { ... }` — switch-выражение: символ → вид токена. `else => return CalcError::UnexpectedChar` — неизвестный символ: возврат ошибки.
   - `tokens` — неявный возврат последнего выражения: список готов.
@@ -222,8 +239,24 @@ enum ParseError {
 
 --- лексер
 
-fn is_digit(link c: u8) -> bool {
-    c >= '0' and c <= '9'
+fn digit_value(link c: str) -> i32 {
+    switch c {
+        "0" => 0,
+        "1" => 1,
+        "2" => 2,
+        "3" => 3,
+        "4" => 4,
+        "5" => 5,
+        "6" => 6,
+        "7" => 7,
+        "8" => 8,
+        "9" => 9,
+        else => -1,
+    }
+}
+
+fn is_digit(link c: str) -> bool {
+    digit_value(c) >= 0
 }
 
 fn lex(link input: str) -> [Token] or ParseError {
@@ -233,7 +266,7 @@ fn lex(link input: str) -> [Token] or ParseError {
     while i < input.len {
         let c = input[i]
 
-        if c == ' ' {
+        if c == " " {
             mut i += 1
             continue
         }
@@ -241,7 +274,7 @@ fn lex(link input: str) -> [Token] or ParseError {
         if is_digit(c) {
             let num = 0
             while i < input.len and is_digit(input[i]) {
-                mut num = num * 10 + (input[i] - '0')
+                mut num = num * 10 + digit_value(input[i])
                 mut i += 1
             }
             mut tokens.push(Token { kind: TokenKind.Num, value: num })
@@ -249,12 +282,12 @@ fn lex(link input: str) -> [Token] or ParseError {
         }
 
         let kind = switch c {
-            '+' => TokenKind.Add,
-            '-' => TokenKind.Minus,
-            '*' => TokenKind.Mul,
-            '/' => TokenKind.Div,
-            '(' => TokenKind.LParen,
-            ')' => TokenKind.RParen,
+            "+" => TokenKind.Add,
+            "-" => TokenKind.Minus,
+            "*" => TokenKind.Mul,
+            "/" => TokenKind.Div,
+            "(" => TokenKind.LParen,
+            ")" => TokenKind.RParen,
             else => return ParseError::BadExpr,
         }
 
