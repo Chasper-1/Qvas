@@ -88,6 +88,10 @@ fn eval(link tokens: [Token]) -> int or CalcError {
             continue
         }
 
+        if stack.len < 2 {
+            return CalcError::BadExpr
+        }
+
         let b = mut stack.pop()
         let a = mut stack.pop()
 
@@ -160,7 +164,8 @@ fn.nothing main() {
 - `let stack: [int] = {}` — стек чисел.
 - `for token in tokens` — итерация по списку: `token` — **ссылка** на элемент, список не потребляется.
 - `if token.kind == TokenKind.Num` — число: кладём на стек, `continue` — дальше по циклу.
-- `let b`, `let a` — берём два числа со стека: просто берём верхний, следующий сам становится верхним. Пустой стек — логическая ошибка кода, не проверяется.
+- `if stack.len < 2 { return CalcError::BadExpr }` — перед снятием двух чисел проверяем, что на стеке их достаточно; иначе возвращаем `BadExpr`. `pop` на пустом стеке — ошибка времени выполнения (panic), поэтому до неё не доводим.
+- `let b`, `let a` — берём два числа со стека: просто берём верхний, следующий сам становится верхним.
 - `if ... Div and b == 0` — проверка деления на ноль, отдельно от `switch`.
 - `let result = switch token.kind { ... }` — `switch` как выражение: выдаёт результат арифметической операции. Каждая ветка — одно выражение: `a + b`, `a - b`, `a * b`, `a / b`.
 - `mut stack.push(result)` — кладём результат на стек.
@@ -402,7 +407,7 @@ fn.nothing main() {
 
 **Зона `--- точка входа`**:
 - `fn parse(box input: str) -> (int, [Node]) or ParseError`:
-  - `let tokens = lex(input)?` — лексер. `parse` потребляет строку через `box`, `lex` — конечный читатель: проброса ссылки нет.
+  - `let tokens = lex(input)?` — лексер. `parse` потребляет строку через `box`; `lex` читает `input` напрямую и не возвращает ссылку — результат собственный список токенов.
   - `let p = Parser { tokens: tokens, nodes: {}, pos: 0 }` — начальное состояние парсера.
   - `let (root, p1) = parse_expr(box(p))?` — разбор всего выражения. `root` — индекс корневого узла в арене.
   - `let last = peek(p1)` — после выражения должен быть `Eof`, иначе в выражении лишние токены.
