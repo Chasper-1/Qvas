@@ -23,7 +23,7 @@
 ```text
 use std
 
-fn sum(box a: int, box b: int) -> int {
+fn sum(box a: i32, box b: i32) -> i32 {
     a + b
 }
 
@@ -50,7 +50,7 @@ sub main() {
 - [docs/ru/05-references.md](docs/ru/05-references.md) — проверка ссылок: три правила, CFG, формат ошибок
 - [docs/ru/06-parallelism.md](docs/ru/06-parallelism.md) — параллелизм: `parallel { ... }`, граф зависимостей
 - [docs/ru/07-functions.md](docs/ru/07-functions.md) — вычисления и действия: контракт, мутация, значения
-- [docs/ru/08-types.md](docs/ru/08-types.md) — типы: статические, модификаторы `int:id` / `int:=id`
+- [docs/ru/08-types.md](docs/ru/08-types.md) — типы: статические, числовые, метки `i32:id`, источники `i32:=id`
 - [docs/ru/09-modules.md](docs/ru/09-modules.md) — модули: `use std`, `link file`, области видимости
 - [docs/ru/10-errors.md](docs/ru/10-errors.md) — обработка ошибок: `T or E`, явный `switch`, `defer`, режимы ошибок
 - [docs/ru/11-compiler.md](docs/ru/11-compiler.md) — компилятор: Cranelift, IR (SSA), плоский AST

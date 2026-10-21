@@ -17,7 +17,7 @@ sub name(params) { ... }
 - потребляющий параметр — `box` (компилятор решает копия или move по числу использований у вызывающего).
 
 ```text
-fn read(link data: Data) -> int { ... }      // вычисление: читает и отдаёт ответ
+fn read(link data: Data) -> i32 { ... }      // вычисление: читает и отдаёт ответ
 sub print_data(link data: Data) { ... }      // действие: читает, ответа нет
 sub consume(box data: Data) { ... }          // действие: потребляет, ответа нет
 ```
@@ -41,7 +41,7 @@ consume(box(a))             // параметр box — на вызове пиш
 `fn` всегда отдаёт ответ. Ответ обязан быть потреблён: связан, использован, передан или возвращён. Голый вызов `fn` — ошибка.
 
 ```text
-fn sum(box a: int, box b: int) -> int { a + b }
+fn sum(box a: i32, box b: i32) -> i32 { a + b }
 
 let r = sum(box(3, 5))      // ответ потреблён
 ```
@@ -91,7 +91,7 @@ sub main() {
 Вычисление можно передать в вычисление — как везде:
 
 ```text
-fn apply(link f: Fn, box value: int) -> int {
+fn apply(link f: Fn, box value: i32) -> i32 {
     f(value)
 }
 

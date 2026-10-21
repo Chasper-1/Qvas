@@ -23,7 +23,7 @@ enum TokenKind {
 
 struct Token {
     kind: TokenKind,
-    value: int,
+    value: i32,
 }
 
 --- ошибки
@@ -79,8 +79,8 @@ fn tokenize(link input: str) -> [Token] or CalcError {
 
 --- вычисление
 
-fn eval(link tokens: [Token]) -> int or CalcError {
-    let stack: [int] = {}
+fn eval(link tokens: [Token]) -> i32 or CalcError {
+    let stack: [i32] = {}
 
     for token in tokens {
         if token.kind == TokenKind.Num {
@@ -159,9 +159,9 @@ sub main() {
   - `switch c { ... }` — switch-выражение: символ → вид токена. `else => return CalcError::UnexpectedChar` — неизвестный символ: возврат ошибки.
   - `tokens` — неявный возврат последнего выражения: список готов.
 
-**Зона `--- вычисление`** — `fn eval(link tokens: [Token]) -> int or CalcError`:
+**Зона `--- вычисление`** — `fn eval(link tokens: [Token]) -> i32 or CalcError`:
 - `link tokens` — читаем список токенов (не потребляем).
-- `let stack: [int] = {}` — стек чисел.
+- `let stack: [i32] = {}` — стек чисел.
 - `for token in tokens` — итерация по списку: `token` — **ссылка** на элемент, список не потребляется.
 - `if token.kind == TokenKind.Num` — число: кладём на стек, `continue` — дальше по циклу.
 - `if stack.len < 2 { return CalcError::BadExpr }` — перед снятием двух чисел проверяем, что на стеке их достаточно; иначе возвращаем `BadExpr`. `pop` на пустом стеке — ошибка времени выполнения (panic), поэтому до неё не доводим.
@@ -197,7 +197,7 @@ enum TokenKind { Num, Add, Minus, Mul, Div, LParen, RParen, Eof }
 
 struct Token {
     kind: TokenKind,
-    value: int,
+    value: i32,
 }
 
 enum NodeKind { Num, Bin, Neg }
@@ -205,15 +205,15 @@ enum NodeKind { Num, Bin, Neg }
 struct Node {
     kind: NodeKind,
     op: TokenKind,
-    value: int,
-    left: int,
-    right: int,
+    value: i32,
+    left: i32,
+    right: i32,
 }
 
 struct Parser {
     tokens: [Token],
     nodes: [Node],
-    pos: int,
+    pos: i32,
 }
 
 enum ParseError {
@@ -277,7 +277,7 @@ fn advance(box p: Parser) -> Parser {
     p
 }
 
-fn emit(box p: Parser, box node: Node) -> (int, Parser) {
+fn emit(box p: Parser, box node: Node) -> (i32, Parser) {
     let idx = p.nodes.len
     mut p.nodes.push(node)
     (idx, p)
@@ -285,7 +285,7 @@ fn emit(box p: Parser, box node: Node) -> (int, Parser) {
 
 --- рекурсивный спуск
 
-fn parse_factor(box p: Parser) -> (int, Parser) or ParseError {
+fn parse_factor(box p: Parser) -> (i32, Parser) or ParseError {
     let tok = peek(p)
 
     switch tok.kind {
@@ -320,7 +320,7 @@ fn parse_factor(box p: Parser) -> (int, Parser) or ParseError {
     }
 }
 
-fn parse_term(box p: Parser) -> (int, Parser) or ParseError {
+fn parse_term(box p: Parser) -> (i32, Parser) or ParseError {
     let r = parse_factor(box(p))
     let (left, p1) = switch r {
         ParseError::BadExpr => return ParseError::BadExpr,
@@ -329,7 +329,7 @@ fn parse_term(box p: Parser) -> (int, Parser) or ParseError {
     term_tail(box(left, p1))
 }
 
-fn term_tail(box left: int, box p: Parser) -> (int, Parser) or ParseError {
+fn term_tail(box left: i32, box p: Parser) -> (i32, Parser) or ParseError {
     let tok = peek(p)
     if tok.kind != Mul and tok.kind != Div {
         return (left, p)
@@ -344,7 +344,7 @@ fn term_tail(box left: int, box p: Parser) -> (int, Parser) or ParseError {
     term_tail(box(idx, p3))
 }
 
-fn parse_expr(box p: Parser) -> (int, Parser) or ParseError {
+fn parse_expr(box p: Parser) -> (i32, Parser) or ParseError {
     let r = parse_term(box(p))
     let (left, p1) = switch r {
         ParseError::BadExpr => return ParseError::BadExpr,
@@ -353,7 +353,7 @@ fn parse_expr(box p: Parser) -> (int, Parser) or ParseError {
     expr_tail(box(left, p1))
 }
 
-fn expr_tail(box left: int, box p: Parser) -> (int, Parser) or ParseError {
+fn expr_tail(box left: i32, box p: Parser) -> (i32, Parser) or ParseError {
     let tok = peek(p)
     if tok.kind != Add and tok.kind != Minus {
         return (left, p)
@@ -370,7 +370,7 @@ fn expr_tail(box left: int, box p: Parser) -> (int, Parser) or ParseError {
 
 --- точка входа
 
-fn parse(box input: str) -> (int, [Node]) or ParseError {
+fn parse(box input: str) -> (i32, [Node]) or ParseError {
     let tokens_result = lex(input)
     let tokens = switch tokens_result {
         ParseError::BadExpr => return ParseError::BadExpr,
@@ -418,7 +418,7 @@ sub main() {
 **Зона `--- хелперы парсера`** — три вычисления:
 - `fn peek(link p: Parser) -> Token` — **читает** текущий токен (`p.tokens[p.pos]`), не двигает позицию. Параметр-ссылка: парсер не потребляется.
 - `fn advance(box p: Parser) -> Parser` — **потребляет** парсер, двигает позицию (`mut p.pos += 1`) и возвращает новое состояние. Здесь работает модель «данные пришли (потребление), поменялись через `mut`, вернулись (return = передача)». Компилятор решает копия или move по числу использований.
-- `fn emit(box p: Parser, box node: Node) -> (int, Parser)` — добавляет узел в арену (`mut p.nodes.push(node)`), возвращает **кортеж**: индекс нового узла + новое состояние парсера.
+- `fn emit(box p: Parser, box node: Node) -> (i32, Parser)` — добавляет узел в арену (`mut p.nodes.push(node)`), возвращает **кортеж**: индекс нового узла + новое состояние парсера.
 
 **Зона `--- рекурсивный спуск`** — грамматика:
 - `parse_factor` — самый низкий уровень: число, унарный минус или выражение в скобках.
@@ -432,15 +432,15 @@ sub main() {
 - Приоритет получается сам собой: `parse_expr` вызывает `parse_term`, тот — `parse_factor`. Поэтому `3 + 4 * (2 - 1)` разбирается как `3 + (4 * (2 - 1))`, а не `(3 + 4) * (2 - 1)`.
 
 **Зона `--- точка входа`**:
-- `fn parse(box input: str) -> (int, [Node]) or ParseError`:
+- `fn parse(box input: str) -> (i32, [Node]) or ParseError`:
   - `let tokens_result = lex(input)` — лексер. `parse` потребляет строку через `box`; `lex` читает `input` напрямую и не возвращает ссылку — результат собственный список токенов. Ошибка сразу разбирается через `switch`.
   - `let p = Parser { tokens: tokens, nodes: {}, pos: 0 }` — начальное состояние парсера.
   - `let root_result = parse_expr(box(p))` — разбор всего выражения; результат сразу разбирается через `switch`. `root` — индекс корневого узла в арене.
   - `let last = peek(p1)` — после выражения должен быть `Eof`, иначе в выражении лишние токены.
   - `(root, p1.nodes)` — возврат: индекс корня + вся арена узлов.
 - `sub main()`:
-  - `let result = parse(box("3 + 4 * (2 - 1)"))` — разбор. `parse` возвращает `(int, [Node]) or ParseError`.
-  - `switch result { ... }` — обработка ошибки: `ParseError::BadExpr` — сообщение; `else` — успех, `result` — кортеж `(int, [Node])`.
+  - `let result = parse(box("3 + 4 * (2 - 1)"))` — разбор. `parse` возвращает `(i32, [Node]) or ParseError`.
+  - `switch result { ... }` — обработка ошибки: `ParseError::BadExpr` — сообщение; `else` — успех, `result` — кортеж `(i32, [Node])`.
   - `let (root, nodes) = result` — разбор кортежа: индекс корневого узла и арена узлов.
   - `std.print(root)` — индекс корневого узла.
   - `std.print(nodes.len)` — сколько узлов в арене.
@@ -470,6 +470,6 @@ sub main() {
 | `a[i]` | оба | чтение по индексу (ссылка) |
 | `a.len` | оба | чтение длины (контракт: длина читает) |
 | `Token { kind: ..., value: ... }` | оба | создание структуры |
-| `(int, Parser)` | пример 2 | кортеж: несколько возвращаемых значений |
+| `(i32, Parser)` | пример 2 | кортеж: несколько возвращаемых значений |
 | неявный возврат последнего выражения | оба | `tokens`, `stack[0]`, `(idx, p)` |
 | `std.print()` | оба | вызов действия из std |
