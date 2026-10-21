@@ -21,35 +21,38 @@
 ## Пример
 
 ```text
-let x = 10                // копия: независимое значение
-let y = 20
-link view = x             // ссылка: чтение, умирает при mut x
+use std
 
 fn sum(box a: int, box b: int) -> int {
     a + b
 }
 
-let result = sum(box(x, y))   // использование: компилятор решает копия или move
+sub main() {
+    let x = 10                // копия: независимое значение
+    let y = 20
+    let result = sum(box(x, y))   // использование: компилятор решает копия или move
+    std.print(result)
 
-parallel {
-    let data = load_data()
-    let ratio = compute_ratio()
-    let report = build_report(data, ratio)
+    parallel {
+        let data = load_data()
+        let ratio = compute_ratio()
+        let report = build_report(data, ratio)
+    }
 }
 ```
 
 ## Документация
 
 - [docs/ru/01-overview.md](docs/ru/01-overview.md) — обзор: цели, философия (10 принципов), модель обучения
-- [docs/ru/02-syntax.md](docs/ru/02-syntax.md) — синтаксис: ключевые слова, переменные, функции, условия, циклы, зоны
+- [docs/ru/02-syntax.md](docs/ru/02-syntax.md) — синтаксис: ключевые слова, переменные, вычисления и действия, условия, циклы, зоны
 - [docs/ru/03-data-model.md](docs/ru/03-data-model.md) — модель данных: копия, ссылки, box, контракты операций
 - [docs/ru/04-memory.md](docs/ru/04-memory.md) — память: автоматическое управление, move/копия
 - [docs/ru/05-references.md](docs/ru/05-references.md) — проверка ссылок: три правила, CFG, формат ошибок
 - [docs/ru/06-parallelism.md](docs/ru/06-parallelism.md) — параллелизм: `parallel { ... }`, граф зависимостей
-- [docs/ru/07-functions.md](docs/ru/07-functions.md) — функции: контракт, мутация, функции как значения
+- [docs/ru/07-functions.md](docs/ru/07-functions.md) — вычисления и действия: контракт, мутация, значения
 - [docs/ru/08-types.md](docs/ru/08-types.md) — типы: статические, модификаторы `int:id` / `int:=id`
 - [docs/ru/09-modules.md](docs/ru/09-modules.md) — модули: `use std`, `link file`, области видимости
-- [docs/ru/10-errors.md](docs/ru/10-errors.md) — обработка ошибок: `?`, `defer`, режимы ошибок
+- [docs/ru/10-errors.md](docs/ru/10-errors.md) — обработка ошибок: `T or E`, явный `switch`, `defer`, режимы ошибок
 - [docs/ru/11-compiler.md](docs/ru/11-compiler.md) — компилятор: Cranelift, IR (SSA), плоский AST
 - [docs/ru/12-future.md](docs/ru/12-future.md) — идеи на будущее: JIT, comptime, self-hosting
 - [docs/ru/13-status.md](docs/ru/13-status.md) — статус: концепция завершена, дальше — реализация
