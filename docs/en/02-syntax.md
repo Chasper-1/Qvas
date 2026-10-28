@@ -115,7 +115,41 @@ switch x {
 }
 ```
 
-`switch` is an expression, it yields a value. Branching (running different code without a value) is done via `if`/`else if`. It covers 90% of pattern-matching needs.
+`switch` is an expression, it yields a value. It compares ordinary values: numbers, strings, variants without data. The default branch is `else`. Branching (running different code without a value) is done via `if`/`else if`.
+
+## Enum
+
+An `enum` is a choice: one of the listed items, a second one cannot be chosen. A variant may carry its own data:
+
+```text
+enum Shape {
+    Circle(f64),
+    Empty,
+    Rect(f64, f64),
+}
+```
+
+`Circle` carries one number, `Rect` two, `Empty` none. The data belongs to the variant: `Circle` has only a radius, `Rect` only width and height. A circle with a width cannot be built.
+
+Without data a variant is just a label: `enum TokenKind { Num, Add, Mul }`.
+
+## Match
+
+```text
+let area = match shape {
+    Circle(r) => 3.14 * r * r,
+    Rect(w, h) => w * h,
+    Empty => 0,
+}
+```
+
+`match` is an expression. It looks at the variant and gives access to that variant's data: `r`, `w`, `h` are names for reading, they live only inside their branch. The data is not copied or taken, `match` only reads.
+
+- The match must be complete: all variants listed. Forgetting a branch is a compile error. `else` is not needed.
+- Inside a branch only its data is visible: in the `Circle` branch there is `r`, but no `w`.
+- The names `r`, `w`, `h` are for reading only and do not escape the branch.
+
+`switch` compares values, `match` destructures variants. For variants without data either works; `match` is needed where a variant has data.
 
 ## Loops
 

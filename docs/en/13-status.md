@@ -44,12 +44,14 @@ What is closed: the language core, basic syntax, ecosystem, error messages, scop
 - **Warnings** — overflow always produces a warning, release/debug makes no difference. Suppression — `no_warn` before an operator/expression/declaration: suppresses only warnings, never errors, applies to one thing.
 - **Comments** — `//`.
 - **Tests** — via `---` zones: a separate test zone.
+- **`enum` with data** — an `enum` is a choice: one of the listed items, a second one cannot be chosen. A variant may carry its own data: `Circle(f64)`, `Rect(f64, f64)`, `Empty`. The data belongs to the variant.
+- **`match`** — destructures a variant and gives names to the data inside the branch: `Circle(r) => ...`. The names are for reading only and live until the end of the branch. The match must be complete, `else` is not needed. `switch` compares values, `match` destructures variants.
 
 ## Syntactic sugar
 
-**Take** (cheap, hides nothing): string interpolation, ranges + `for..in`, inclusive ranges (`0..=n`), `while`, if-expression, methods (`mut vec.push(x)`), type inference, `defer`, slices (`a[1:3]`), tuples / multiple return values, switch, type labels (`i32:id`), implicit return of the last expression, `break`/`continue`, `else if`, `+=`, explicit type casting, hex/bin/oct literals, tests via `---` zones, comptime.
+**Take** (cheap, hides nothing): string interpolation, ranges + `for..in`, inclusive ranges (`0..=n`), `while`, if-expression, methods (`mut vec.push(x)`), type inference, `defer`, slices (`a[1:3]`), tuples / multiple return values, switch, match, enums with data (sum types), type labels (`i32:id`), implicit return of the last expression, `break`/`continue`, `else if`, `+=`, explicit type casting, hex/bin/oct literals, tests via `---` zones, comptime.
 
-**Do not take** (not necessary): operator overloading, exceptions, pattern matching (Rust-style), null operators, default/named arguments, macros, interfaces/traits, async/await, coroutines/generators, reflection, GC/RAII, enums with data (sum types), chained comparisons, loop labels, raw strings, multiline strings, pointers (raw pointers) — a reference (`link`) is the safe pointer, user panics/asserts — business errors via `T or E` on `fn`, panic only for runtime checks (references, bounds), recursive types — the arena (array + indices) covers it, dictionaries (maps) — not in v1; a fixed set of fields — `struct`, dynamic keys — later; blueprints — not in v1: it is an ordinary function without concrete types, there is no separate notation for it.
+**Do not take** (not necessary): operator overloading, exceptions, null operators, default/named arguments, macros, interfaces/traits, async/await, coroutines/generators, reflection, GC/RAII, chained comparisons, loop labels, raw strings, multiline strings, pointers (raw pointers) — a reference (`link`) is the safe pointer, user panics/asserts — business errors via `T or E` on `fn`, panic only for runtime checks (references, bounds), recursive types — the arena (array + indices) covers it, dictionaries (maps) — not in v1; a fixed set of fields — `struct`, dynamic keys — later; blueprints — not in v1: it is an ordinary function without concrete types, there is no separate notation for it.
 
 Principle: do not cut functionality. What we do not build in v1, we design so that it can be added later without breakage.
 
