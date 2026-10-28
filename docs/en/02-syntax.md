@@ -82,6 +82,7 @@ sub main() {
 
 - The answer of `fn` must be consumed: bound, used, passed, or returned. A bare `fn` call is an error.
 - `sub` gives no answer. It cannot be assigned, passed, returned, or used in an expression. Only a call as a statement.
+- `fn` does not call `sub`: a computation does not perform actions. Calls go in one direction only — `sub` calls `fn`, but not the other way around.
 - `fn` can return `T or E`; the caller must immediately handle the result via `switch`. `sub` does not pass an error out.
 - `fn` can be a value of type `Fn`; `sub` is not a value.
 

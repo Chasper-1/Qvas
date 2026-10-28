@@ -104,6 +104,8 @@ let result = apply(my_func, box(42))
 
 `fn` are called from any `fn` or `sub` without specifying the call in the signature. A call is the use of ready logic: one function, many calls. There are no implicit inputs: data comes only through parameters according to the contract. The logic of a function does not depend on the logic of the caller.
 
+`fn` does not call `sub`: a computation does not perform actions. Calls go in one direction only — `sub` calls `fn`, but not the other way around. If an action is needed inside a computation, it is an action, not a computation.
+
 ## Return
 
 The answer is data, passing is a move. The answer is not a reference; it is not in two places at once.
