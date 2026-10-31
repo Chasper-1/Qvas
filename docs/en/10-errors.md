@@ -1,12 +1,12 @@
-# Error Handling
+# Error handling
 
 ## Approach
 
-An error is a feature, not a bug. An error is not propagated automatically: a result with an error is examined at the call site.
+An error is a feature, not a bug. An error is handled where it arose: at the call site. There is no propagation.
 
 ## An error is a value
 
-An error is an ordinary value. What exactly it is, the programmer decides:
+An error is an ordinary value. What exactly it is — the programmer decides:
 
 ```text
 enum FileError {
@@ -18,50 +18,68 @@ enum FileError {
 ## A computation can return "value or error"
 
 ```text
-fn read_file() -> Data or FileError {
+fn read_file(link path: str) -> Data or FileError {
     ...
 }
 ```
 
-`T or E` is the answer of a computation. This is not permission to propagate the error: the caller must immediately examine the result.
+`T or E` is a computation's answer. The caller must handle the result right at the call site, via `switch` or `match`.
 
-## Handling on the spot
+## An action returns a check
+
+A `sub` works with the world and returns a check — information about what was written, where, how much:
 
 ```text
-sub main() {
-    let result = read_file()
+sub write_file(link path: str, link data: Data) -> usize or FileError
+```
+
+A check is not a value for computations but information. Needed — bind it or handle it. Not needed — do not take it: the data is already placed, that was the work.
+
+## Errors are handled in place
+
+```text
+sub show(link path: str) {
+    let result = read_file(path)
     switch result {
-        FileError::NotFound => std.print("file not found"),
-        FileError::PermissionDenied => std.print("permission denied"),
-        else => std.print(result),
+        FileError::NotFound => ignore!(print("file not found")),
+        FileError::PermissionDenied => ignore!(print("no access")),
+        else => ignore!(print(result)),
     }
 }
 ```
 
-If a computation calls another computation with `T or E`, it too must handle the result via `switch`. A bare call of such a computation is an error.
+An `fn` returned `T or E` — the caller handles it, right at the call site. A `sub` is called only by another `sub`, so the calling `sub` handles the error there.
 
-## There is no `?`
+There is no error that cannot be handled in place. If one does not fit — the code is written badly.
 
-There is no `?` operator in the language. It moves the error out of the place where it originated — the language does not do that.
+## There is no propagation
 
-## Actions and errors
+The `?` operator does not exist in the language. It moves an error out of the place where it arose — the language does not do that.
 
-`sub` does not return an error. If a computation with `T or E` is called inside an action, the action must handle the result via `switch` inside itself. If the action cannot do this, it is a code design error, not a reason to return the error outward.
+## `ignore!` — explicitly not taking the check
 
-## Lazy and detailed modes
+```text
+ignore!(print("x"))
+```
 
-**Lazy mode:** the compiler generates the error number from the place (file, line, computation or action); you look up the number in the docs.
+The code visibly shows that the check is not used. A bare `print("x")` is the same thing, a call as a statement.
 
-**Detailed mode:** you write yourself what to put into the error.
+## Lazy and verbose modes
+
+**Lazy mode:** the compiler generates the error number from the location (file, line, computation or action); you look the number up in the docs.
+
+**Verbose mode:** you write yourself what to put into the error.
 
 ## `defer` — deferred execution
 
-`defer` is deferred execution (closing resources, etc.):
+`defer` is deferred execution (closing resources and the like):
 
 ```text
 sub work() {
     let f = open(path)
-    defer f.close()
+    defer ignore!(f.close())
     ...
 }
 ```
+
+The action call is postponed until the block exits. If the action has a check, it is taken or not taken right there.

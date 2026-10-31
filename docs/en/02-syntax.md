@@ -6,7 +6,7 @@
 |---|---|
 | `let` | create a variable |
 | `fn` | computation: returns an answer, the answer must be consumed |
-| `sub` | action: no answer, called as a statement |
+| `sub` | action: returns a check — information about where the data went |
 | `link` | create a reference (reading, dies on `mut`) or connect a file (`link file = "file.lang"`) |
 | `link&` | long-lived reference to a slot (survives `mut`, the slot's existence is checked at runtime) |
 | `link*` | long-lived reference with freeze (the data cannot be changed while the reference is alive) |
@@ -64,27 +64,43 @@ Two different entities, not interchangeable:
 
 ```text
 fn name(params) -> type { ... }
-sub name(params) { ... }
+sub name(params) -> type or E { ... }
 ```
 
-`fn` declares a computation: it always has an answer. `sub` declares an action: no answer, the call is a statement. `let` is not needed in either place.
+`fn` declares a computation: it returns an answer. `sub` declares an action: with `or E` it returns a check — information about where the data went. The `fn` answer must be consumed.
 
 ```text
+main() -> Sys
+
 fn sum(box a: i32, box b: i32) -> i32 {
     a + b
 }
 
 sub main() {
     let r = sum(box(3, 5))
-    std.print(r)
+    ignore!(print(r))
 }
 ```
 
 - The answer of `fn` must be consumed: bound, used, passed, or returned. A bare `fn` call is an error.
-- `sub` gives no answer. It cannot be assigned, passed, returned, or used in an expression. Only a call as a statement.
+- The check of `sub` is information about where the data went. Needed — bind it or handle it; not needed — do not take it, or `ignore!`.
+- A `sub` without `or E` cannot fail: there is no error, the call is a statement.
+- `ignore!` explicitly does not take the check: `ignore!(print(x))`.
+- `out` is a parameter for writing into someone else's memory: `read_into(path, out(buf))`.
 - `fn` does not call `sub`: a computation does not perform actions. Calls go in one direction only — `sub` calls `fn`, but not the other way around.
-- `fn` can return `T or E`; the caller must immediately handle the result via `switch`. `sub` does not pass an error out.
+- `fn` can return `T or E`; the caller must handle the result at the call site via `switch` or `match`. There is no propagation.
 - `fn` can be a value of type `Fn`; `sub` is not a value.
+- The entry is declared at the top of the file: `main() -> Sys`. It says where the data goes, not a return type. `Sys` is a sink, not a type. For embedded systems the sink is different, its name is provided by the platform.
+
+## Sugar
+
+A form with `!` is a convenient notation, not a new entity:
+
+```text
+getline!(line)
+```
+
+The expansion is visible in the IDE and the documentation. The tag comes from the expansion: if an action is inside, the form is an action, and it cannot be called from an `fn`.
 
 ## Templates and blueprints
 

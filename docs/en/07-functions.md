@@ -7,7 +7,7 @@ fn name(params) -> type { ... }
 sub name(params) { ... }
 ```
 
-`fn` is a computation: it always returns an answer. `sub` is an action: no answer, the call is a statement. `let` is not needed in either place.
+`fn` is a computation: it returns an answer, the answer must be consumed. `sub` is an action: it returns a check. A check is information about where the data went.
 
 ## Contract
 
@@ -17,17 +17,17 @@ Parameters declare whether they read or consume. It is visible in the signature:
 - a consuming parameter — `box` (the compiler decides copy or move by the number of uses at the caller).
 
 ```text
-fn read(link data: Data) -> i32 { ... }      // computation: reads and returns an answer
-sub print_data(link data: Data) { ... }      // action: reads, no answer
-sub consume(box data: Data) { ... }          // action: consumes, no answer
+fn read(link data: Data) -> i32 { ... }             // computation: reads and returns an answer
+sub print_data(link data: Data) -> () or E { ... }  // action: reads, returns a check
+sub consume(box data: Data) -> () or E { ... }      // action: consumes, returns a check
 ```
 
 At the call site the contract is observed explicitly:
 
 ```text
-let n = read(a)             // link parameter — a reference is passed, no box needed
-print_data(a)               // action: call as a statement
-consume(box(a))             // box parameter — box is written at the call
+let n = read(a)                 // link parameter — a reference is passed, no box needed
+ignore!(print_data(a))          // action: the check is not needed — not taken
+ignore!(consume(box(a)))        // box parameter — box is written at the call
 ```
 
 The signature shows what to write at the call site: a consuming parameter requires `box` at the call site.
@@ -68,19 +68,75 @@ The data arrived (consumption), was changed via `mut`, and was returned (return 
 
 ## Action
 
-`sub` returns no answer. It cannot be assigned, passed, returned, or used in an expression. Only a call as a statement.
+A `sub` works with the world: writes, sends, draws, calls a syscall. The data goes into memory — the world is memory. The result is a check: what was written, where, how much, what was sent.
 
 ```text
-sub main() {
-    let data = ...
-    consume(box(data))
-    print_data(data)
+sub print(link s: str) -> () or IoError
+sub open(link path: str) -> FileId or IoError                     // FileId — where
+sub read_into(link path: str, out buf: [u8]) -> usize or IoError  // usize — how much
+```
+
+A check is not a value for computations but information. Needed — bind it or handle it. Not needed — do not take it: the data is already placed, that was the work.
+
+- `ignore!` — explicitly not take the check, visible in the code;
+- `switch` / `match` — handle it in place.
+
+```text
+sub copy(link from: str, link to: str) -> () or FileError {
+    let data = read_file(from)
+    switch data {
+        FileError::NotFound => ignore!(print("no file")),
+        else => ignore!(write_file(to, data)),
+    }
 }
 ```
 
-An action is the top of the chain: it has no answer for anyone to consume. It itself consumes data and answers of computations.
+If an action can fail, it returns `or E`. The error is handled at the call site, as with `fn`. There is no propagation.
 
-`sub` does not return an error. If a computation that returned `T or E` is called inside an action, the result must be handled via `switch` at the call site, inside that action.
+A `sub` without `or E` cannot fail: there is no error, the call is a statement.
+
+```text
+sub push(link list: [T], box value: T) { ... }
+
+mut tokens.push(token)      // nothing can fail
+```
+
+## `out` — writing into someone else's memory
+
+`link` only reads, `box` takes. `out` gives write access and is visible at the call site.
+
+```text
+sub greet(out buf: [u8]) -> usize { ... }
+
+let buf: [u8] = {}
+let n = greet(out(buf))
+```
+
+## `main`
+
+The entry is declared at the top of the file:
+
+```text
+main() -> Sys
+```
+
+This is not a function's return type. It says where the data goes: `main` gives it to `Sys`. `Sys` is a sink, not a type.
+
+For embedded systems the sink is different: `main() -> Metal`. The sink's name is provided by the platform; the language does not fix it.
+
+`main` is an action with no caller in the language: the platform starts it and reads what went into the sink. Errors inside `main` are handled in place, as everywhere.
+
+There is no reverse notation `Sys = main()`: the boundary is one, it cannot be crossed twice.
+
+## Sugar
+
+Convenient forms (`getline!`, `read_into!`) are a thin layer. Three rules:
+
+- the expansion is visible: the IDE and the documentation show what the form expands into;
+- the tag follows the expansion, not the name: if an action is inside, the whole form is an action, and it cannot be called from an `fn`;
+- the expansion fits in one's head: "here is an action, here is a computation".
+
+`getline!` expands into `read_into` plus a slice of the buffer; its tag is action.
 
 ## `mut` and move do not mix
 

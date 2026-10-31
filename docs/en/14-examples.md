@@ -9,6 +9,8 @@ Two real examples: a Reverse Polish Notation calculator and a recursive descent 
 The expression `3 4 + 2 *` = `(3 + 4) * 2` = `14`.
 
 ```text
+main() -> Sys
+
 use std
 
 --- types
@@ -146,13 +148,13 @@ sub main() {
     let input = "3 4 + 2 *"
     let tokens = tokenize(input)
     switch tokens {
-        CalcError::UnexpectedChar => std.print("unknown character"),
+        CalcError::UnexpectedChar => ignore!(print("unknown character")),
         else => {
             let result = eval(tokens)
             switch result {
-                CalcError::DivByZero => std.print("division by zero"),
-                CalcError::BadExpr => std.print("bad expression"),
-                else => std.print(result),
+                CalcError::DivByZero => ignore!(print("division by zero")),
+                CalcError::BadExpr => ignore!(print("bad expression")),
+                else => ignore!(print(result)),
             }
         }
     }
@@ -198,13 +200,13 @@ sub main() {
 - `if stack.len != 1 { return CalcError::BadExpr }` — after all operations exactly one result must remain on the stack.
 - `stack[0]` — reading the result (implicit return).
 
-**Zone `--- entry point`** — `sub main()`:
+**Zone `--- entry point`** — `sub main() -> Sys`:
 - `let input = "3 4 + 2 *"` — an expression.
 - `let tokens = tokenize(input)` — the lexer. `tokenize` returns `[Token] or CalcError`.
 - `switch tokens { ... }` — handling the lexer error: `CalcError::UnexpectedChar` — unknown character; `else` — success, `tokens` is the token list.
 - `let result = eval(tokens)` — the computation. `eval` reads `tokens` via `link` — passing without `box`.
 - `switch result { ... }` — handling the computation error: `CalcError::DivByZero` — division by zero; `CalcError::BadExpr` — bad expression; `else` — success, `result` is a number.
-- `std.print(result)` — output. `print` is a `sub`: no answer, call as a statement.
+- `ignore!(print(result))` — output. `print` is a `sub`: it returns a check, `ignore!` explicitly refuses to verify it.
 
 **Data flow:** `main` → `tokenize` (string → tokens) → `eval` (tokens → number) → `print`. Each computation and action does one thing, errors are handled explicitly via `switch`, contracts are visible in the signatures.
 
@@ -215,6 +217,8 @@ sub main() {
 Parses the expression `3 + 4 * (2 - 1)` into a tree of nodes (arena: nodes live in an array, references are indices).
 
 ```text
+main() -> Sys
+
 use std
 
 --- types
@@ -498,11 +502,11 @@ fn parse(box input: str) -> (i32, [Node]) or ParseError {
 sub main() {
     let result = parse(box("3 + 4 * (2 - 1)"))
     switch result {
-        ParseError::BadExpr => std.print("parse error"),
+        ParseError::BadExpr => ignore!(print("parse error")),
         else => {
             let (root, nodes) = result
-            std.print(root)
-            std.print(nodes.len)
+            ignore!(print(root))
+            ignore!(print(nodes.len))
         }
     }
 }
@@ -544,12 +548,12 @@ sub main() {
   - `let root_result = parse_expr(box(p))` — parsing the whole expression; the result is examined immediately via `switch`. `root` is the index of the root node in the arena.
   - `let last = peek(p1)` — after the expression there must be `Eof`, otherwise there are extra tokens in the expression.
   - `(root, p1.nodes)` — return: the root index + the whole node arena.
-- `sub main()`:
+- `sub main() -> Sys`:
   - `let result = parse(box("3 + 4 * (2 - 1)"))` — parsing. `parse` returns `(i32, [Node]) or ParseError`.
   - `switch result { ... }` — handling the error: `ParseError::BadExpr` — a message; `else` — success, `result` is the tuple `(i32, [Node])`.
   - `let (root, nodes) = result` — destructuring the tuple: the root node index and the node arena.
-  - `std.print(root)` — the root node index.
-  - `std.print(nodes.len)` — how many nodes are in the arena.
+  - `ignore!(print(root))` — the root node index.
+  - `ignore!(print(nodes.len))` — how many nodes are in the arena.
 
 **Data flow:** `main` → `parse` → `lex` (string → tokens) → `parse_expr` → `parse_term` → `parse_factor` (tokens → node arena). Parser state is passed explicitly: each computation receives the parser via `box`, mutates it, and returns the new state — no global variables.
 
@@ -564,7 +568,7 @@ sub main() {
 | `enum X { ... }` | both | creating an enum (token kinds, node kinds, errors) |
 | `struct X box { ... }` | both | creating a struct (token, node, parser) |
 | `fn name(params) -> T or E` | both | computation: returns a value or an error, the answer is mandatory |
-| `sub name(params)` | both | action: no answer (`main`, `print`, `push`) |
+| `sub name(params) -> T or E` | both | action: returns a check (`main`, `print`); needed — take it, not needed — `ignore!` |
 | `link param: T` | both | reference parameter: the computation or action reads, does not consume |
 | `box param: T` | example 2 | consuming parameter: the compiler decides copy/move. At the call, one `box(x, y)` for all consuming arguments |
 | `[T]` | both | list (tokens, stack, node arena) |
@@ -578,4 +582,4 @@ sub main() {
 | `struct Token box { kind, value }` | both | creating a struct |
 | `(i32, Parser)` | example 2 | tuple: multiple return values |
 | implicit return of the last expression | both | `tokens`, `stack[0]`, `(idx, p)` |
-| `std.print()` | both | calling an action from std |
+| `ignore!(std.print())` | both | calling an action from std: the check is consumed explicitly |

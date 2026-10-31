@@ -63,7 +63,10 @@ One of the main goals is that the basic model of the language can be understood 
 12. Memory is automatic: the compiler allocates and frees it itself and checks references.
 13. Parallelism: `parallel { ... }` is a block; the compiler builds a dependency graph and schedules it itself *(mechanism in development)*.
 14. `fn` — a computation: returns an answer, the answer must be consumed.
-15. `sub` — an action: no answer, called as a statement. An action is not a value.
+15. `sub` — an action: returns a check — information about where the data went. An action is not a value.
+16. An error is handled at the call site; `ignore!` explicitly does not take the check, `switch`/`match` handles it in place.
+17. `fn` does not call `sub`: a computation does not perform actions.
+18. The entry is declared at the top of the file: `main() -> Sys` — where the data goes. `Sys` is a sink, not a type.
 
 Two learning paths are possible: for beginners — with basic concepts; for experienced programmers — without re-explaining the obvious basics.
 

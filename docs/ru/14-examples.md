@@ -9,6 +9,8 @@
 Выражение `3 4 + 2 *` = `(3 + 4) * 2` = `14`.
 
 ```text
+main() -> Sys
+
 use std
 
 --- типы
@@ -146,13 +148,13 @@ sub main() {
     let input = "3 4 + 2 *"
     let tokens = tokenize(input)
     switch tokens {
-        CalcError::UnexpectedChar => std.print("неизвестный символ"),
+        CalcError::UnexpectedChar => ignore!(print("неизвестный символ")),
         else => {
             let result = eval(tokens)
             switch result {
-                CalcError::DivByZero => std.print("деление на ноль"),
-                CalcError::BadExpr => std.print("неверное выражение"),
-                else => std.print(result),
+                CalcError::DivByZero => ignore!(print("деление на ноль")),
+                CalcError::BadExpr => ignore!(print("неверное выражение")),
+                else => ignore!(print(result)),
             }
         }
     }
@@ -198,13 +200,13 @@ sub main() {
 - `if stack.len != 1 { return CalcError::BadExpr }` — после всех операций на стеке должен остаться ровно один результат.
 - `stack[0]` — чтение результата (неявный возврат).
 
-**Зона `--- точка входа`** — `sub main()`:
+**Зона `--- точка входа`** — `sub main() -> Sys`:
 - `let input = "3 4 + 2 *"` — выражение.
 - `let tokens = tokenize(input)` — лексер. `tokenize` возвращает `[Token] or CalcError`.
 - `switch tokens { ... }` — обработка ошибки лексера: `CalcError::UnexpectedChar` — неизвестный символ; `else` — успех, `tokens` — список токенов.
 - `let result = eval(tokens)` — вычисление. `eval` читает `tokens` через `link` — передача без `box`.
 - `switch result { ... }` — обработка ошибки вычисления: `CalcError::DivByZero` — деление на ноль; `CalcError::BadExpr` — неверное выражение; `else` — успех, `result` — число.
-- `std.print(result)` — вывод. `print` — `sub`: ответа нет, вызов как оператор.
+- `ignore!(print(result))` — вывод. `print` — `sub`: отдаёт чек, `ignore!` — явный отказ его проверять.
 
 **Поток данных:** `main` → `tokenize` (строка → токены) → `eval` (токены → число) → `print`. Каждое вычисление и действие делает одно дело, ошибки обрабатываются явно через `switch`, контракты видны в сигнатурах.
 
@@ -215,6 +217,8 @@ sub main() {
 Разбирает выражение `3 + 4 * (2 - 1)` в дерево узлов (арена: узлы лежат в массиве, ссылки — индексы).
 
 ```text
+main() -> Sys
+
 use std
 
 --- типы
@@ -498,11 +502,11 @@ fn parse(box input: str) -> (i32, [Node]) or ParseError {
 sub main() {
     let result = parse(box("3 + 4 * (2 - 1)"))
     switch result {
-        ParseError::BadExpr => std.print("ошибка разбора"),
+        ParseError::BadExpr => ignore!(print("ошибка разбора")),
         else => {
             let (root, nodes) = result
-            std.print(root)
-            std.print(nodes.len)
+            ignore!(print(root))
+            ignore!(print(nodes.len))
         }
     }
 }
@@ -544,12 +548,12 @@ sub main() {
   - `let root_result = parse_expr(box(p))` — разбор всего выражения; результат сразу разбирается через `switch`. `root` — индекс корневого узла в арене.
   - `let last = peek(p1)` — после выражения должен быть `Eof`, иначе в выражении лишние токены.
   - `(root, p1.nodes)` — возврат: индекс корня + вся арена узлов.
-- `sub main()`:
+- `sub main() -> Sys`:
   - `let result = parse(box("3 + 4 * (2 - 1)"))` — разбор. `parse` возвращает `(i32, [Node]) or ParseError`.
   - `switch result { ... }` — обработка ошибки: `ParseError::BadExpr` — сообщение; `else` — успех, `result` — кортеж `(i32, [Node])`.
   - `let (root, nodes) = result` — разбор кортежа: индекс корневого узла и арена узлов.
-  - `std.print(root)` — индекс корневого узла.
-  - `std.print(nodes.len)` — сколько узлов в арене.
+  - `ignore!(print(root))` — индекс корневого узла.
+  - `ignore!(print(nodes.len))` — сколько узлов в арене.
 
 **Поток данных:** `main` → `parse` → `lex` (строка → токены) → `parse_expr` → `parse_term` → `parse_factor` (токены → арена узлов). Состояние парсера передаётся явно: каждое вычисление получает парсер через `box`, мутирует и возвращает новое состояние — никаких глобальных переменных.
 
@@ -564,7 +568,7 @@ sub main() {
 | `enum X { ... }` | оба | создание enum (виды токенов, узлов, ошибок) |
 | `struct X box { ... }` | оба | создание структуры (токен, узел, парсер) |
 | `fn name(params) -> T or E` | оба | вычисление: отдаёт значение или ошибку, ответ обязателен |
-| `sub name(params)` | оба | действие: ответа нет (`main`, `print`, `push`) |
+| `sub name(params) -> T or E` | оба | действие: отдаёт чек (`main`, `print`); нужен — бери, не нужен — `ignore!` |
 | `link param: T` | оба | параметр-ссылка: вычисление или действие читает, не потребляет |
 | `box param: T` | пример 2 | потребляющий параметр: компилятор решает копия/move. На вызове один `box(x, y)` на все потребляющие аргументы |
 | `[T]` | оба | список (токены, стек, арена узлов) |
@@ -578,4 +582,4 @@ sub main() {
 | `struct Token box { kind, value }` | оба | создание структуры |
 | `(i32, Parser)` | пример 2 | кортеж: несколько возвращаемых значений |
 | неявный возврат последнего выражения | оба | `tokens`, `stack[0]`, `(idx, p)` |
-| `std.print()` | оба | вызов действия из std |
+| `ignore!(std.print())` | оба | вызов действия из std: чек потреблён явно |

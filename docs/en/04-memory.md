@@ -15,7 +15,7 @@ The compiler checks references: a reference cannot outlive the object/slot it po
 ```text
 let a = ...
 link b = a        // reference to the value
-std.print(b)      // last use of the data
+ignore!(print(b))  // last use of the data
 // here the data is dead — the compiler has freed the memory
 ```
 
