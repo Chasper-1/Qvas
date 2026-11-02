@@ -1,5 +1,24 @@
 # Future Ideas
 
+## Explicit size at vector creation — not in v1
+
+When a container is created, the allocation size is mandatory to write down — in objects, not in bytes:
+
+```text
+let v = vec [T; 64]        // size known: 64 objects, the compiler multiplies by the type size itself
+let v = vec [T; none]      // size unknown: empty vector, allocated gradually
+```
+
+Rules:
+
+- the size is always mandatory — either a number or `none`; creating a vector without a size is a compile error;
+- the size is written in objects — the translation into bytes is done by the compiler, not the programmer;
+- the vector mechanics do not change: `none` is the current behavior (empty + gradual allocation); an explicit number is a capacity claim, not a contract;
+- if there turn out to be more actual objects than claimed — the vector grows as usual, that is not an error;
+- both modes are written in one place: know the size — pay one exact allocation and see it in the code; don't know — get gradual growth honestly.
+
+The point: vector creation is the moment an allocation is born, and writing the size confirms the programmer knows this. Over-allocation is visible by eye in the code — no benchmark or profiler is needed to figure out that somebody reserved ten times more than they use.
+
 ## Blueprints — not in v1
 
 A blueprint is a function in which concrete types are not specified: placeholders are left instead of them. There is no separate syntax: it is an ordinary function without concrete types.

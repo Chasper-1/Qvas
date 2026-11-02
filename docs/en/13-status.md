@@ -2,6 +2,8 @@
 
 ## Stage
 
+**Status refers to the language *concept*, not code: the compiler is not written, none of the examples below run.** Implementation progress lives in [TODO.md](../../TODO.md).
+
 The core concept is decided. Parallelism: the concept is fixed, the scheduling mechanism is in development. By blocks:
 
 - types;
@@ -22,7 +24,11 @@ The core concept is decided. Parallelism: the concept is fixed, the scheduling m
 
 What is closed: the language core, basic syntax, ecosystem, error messages, scopes. Parallelism: the concept is decided, the mechanism is in development.
 
+**Again: everything that sounds like "decided" or "closed" is about the concept (the spec), not the compiler. There is no working code.**
+
 ## What is decided by blocks
+
+*(Concept — not code.)*
 
 - **Types** — static, 100%. Numeric: `i8/i16/i32/i64`, `u8/u16/u32/u64`, `f32/f64`; `bool`, `str`. `str` is a sequence of characters: `s[i]` → a `str` of one character, `.len` — the number of characters; there is no `char` and no `String`, byte access — later. Lengths and indices — `i32`, no `usize/isize`. Labels `i32:id` — a refinement of a value, not a new type; `i32:=id` — a binding to a source variable.
 - **Structs** — a way to assemble several different values into one, accessed by field name.
