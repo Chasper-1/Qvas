@@ -4,7 +4,7 @@
 
 **Status refers to the language *concept*, not code: the compiler is not written, none of the examples below run.** Implementation progress lives in [TODO.md](../../TODO.md).
 
-The core concept is decided. Parallelism: the concept is fixed, the scheduling mechanism is in development. By blocks:
+The core concept is decided. Parallelism: the mechanism is solved — a dependency graph from the written order, node routing by entity (`fn` → rayon, `sub` → tokio), execution via existing schedulers. By blocks:
 
 - types;
 - `mut` + operators;
@@ -22,7 +22,7 @@ The core concept is decided. Parallelism: the concept is fixed, the scheduling m
 - error messages;
 - scopes.
 
-What is closed: the language core, basic syntax, ecosystem, error messages, scopes. Parallelism: the concept is decided, the mechanism is in development.
+What is closed: the language core, basic syntax, ecosystem, error messages, scopes, parallelism (concept and mechanism).
 
 **Again: everything that sounds like "decided" or "closed" is about the concept (the spec), not the compiler. There is no working code.**
 
