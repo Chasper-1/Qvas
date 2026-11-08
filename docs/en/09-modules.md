@@ -37,11 +37,11 @@ Chains are allowed, cycles (`a ↔ b`) are a compile error.
 
 ## Passing is explicit
 
-At the call site you can see where you are passing. Two guarantees: you see the giving side and the receiving side — it is impossible to make a mistake. If you have not decided where to give it — then you do not need to pass it.
+At the call site you can see where you are passing. Two guarantees: you see the giving side and the receiving side.
 
 ## Scopes
 
 - The global scope is the whole file. Globals are simply visible by name in their scope.
-- The local scope — a body creates its own scope (for example, a computation or action). Outside the body, what is written inside cannot be used in any way. Where the body ended — there the possibilities of using everything written before ended.
+- The local scope — a body creates its own scope (for example, a computation or action). Outside the body, what is written inside cannot be used in any way.
 
 Between files, things are shared through computations and actions: a file does what it needs and passes the result to another file (`file.calc()`). There are no project-wide globals.

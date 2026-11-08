@@ -77,10 +77,6 @@ For such operations the compiler needs a contract. External code is not obliged 
 
 Reference checking is standard data-flow analysis for life, state-binding, and freeze; it is performed at compile time. The existence of a slot for `link&` is checked at runtime because it depends on data; the slot's contents are not analyzed. Slots and references are explicit, so the analysis itself is simpler than lifetime inference.
 
-Preference is given to:
-
-> more work at compile time → fewer errors at runtime.
-
 ## Error format
 
 A dead reference is explained like this: "here is the reference that you use here, here is how it was killed — that is, at the point of use it no longer exists".

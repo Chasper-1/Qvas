@@ -78,18 +78,6 @@ B
 
 This does not mean `B → A`. Independent parts of the program must not artificially block each other.
 
-## What the programmer describes and what is decided for them
-
-> the programmer describes semantic dependencies, not manually placing every synchronization point for independent operations.
-
-Layers:
-
-1. **Graph** — built from the written order and data dependencies (the `mut`/`box`/`link` rules supply the edges themselves).
-2. **Node routing** — by entity: a `sub` with I/O waits → tokio, a `fn` computes → rayon.
-3. **Execution** — the scheduler already exists and is proven: rayon for the computing, tokio for the waiting.
-
-Low-level primitives such as mutex/atomic/channel can still exist if needed.
-
 ## Parallelism is not the same as memory safety
 
 Parallel execution is considered a separate level.

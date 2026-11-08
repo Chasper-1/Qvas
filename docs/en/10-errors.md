@@ -50,7 +50,7 @@ sub show(link path: str) {
 
 An `fn` returned `T or E` — the caller handles it, right at the call site. A `sub` is called only by another `sub`, so the calling `sub` handles the error there.
 
-There is no error that cannot be handled in place. If one does not fit — the code is written badly.
+There is no error that cannot be handled in place.
 
 ## There is no propagation
 

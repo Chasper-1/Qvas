@@ -50,8 +50,6 @@ Reading is implemented via a reference (`link`, `link&`, or `link*`), changes no
 
 Consumption is passing data via box. The compiler decides copy or move by the number of consuming uses (the rule above).
 
-> Reading is just looking. Taking is box.
-
 ## Operation contracts
 
 The contract belongs to the operation, not to the value. Every operation declares in advance whether it reads or consumes. No guessing — the guarantee is written down.
@@ -214,12 +212,6 @@ If the data is needed deeper or longer, it is passed via `box` (copy or move) or
 ```text
 sub read(link data: Data) { ... }   // reads directly; returning a reference is impossible
 ```
-
-## References do not hide
-
-A reference does not escape: `link` lives where it was created, `link&`/`link*` — as long as they are alive and the target slot exists. A reference is not put into lists and not stored in structs — that is not done.
-
-If data is needed by someone for a long time, it is not hidden in a reference but passed via box (move or copy). The data is either yours, or passed to someone else, or copied. There is no third option.
 
 ## A move kills references
 

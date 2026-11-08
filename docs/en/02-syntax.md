@@ -208,8 +208,8 @@ code
 code
 ```
 
-This is not a comment: the description is attached to the zone. The compiler sees it (parses it, does not report an error) but does nothing with it — like a comment: it does not need to know, and that's it.
+This is not a comment: the description is attached to the zone. The compiler sees it (parses it, does not report an error) and does nothing with it.
 
-The main purpose of zones is to separate imports from receiving/passing and from code, so that this is super obvious. Right now the compiler parses zones, but they do not affect code execution — this is structure and convenience. Tools can use the markup: for example, a separate test zone. In the future, the compiler may be able to mark zones in the AST into finer structures and interact with them.
+The main purpose of zones is to separate imports from receiving/passing and from code, so that this is super obvious. Right now the compiler parses zones. Tools can use the markup: for example, a separate test zone. In the future, the compiler may be able to mark zones in the AST into finer structures and interact with them.
 
-The accepted order in a file: first the `use` zone (imports), then the `link file` zone (file connections), then code. This way `link` is not confused: in the imports zone `link file = "..."` is a file connection, while in code `link b = a` is a reference. This is the order the language suggests using; if you do not want to, it is not forbidden, but then you will have to figure out for yourself where is what.
+The accepted order in a file: first the `use` zone (imports), then the `link file` zone (file connections), then code. This way `link` is not confused: in the imports zone `link file = "..."` is a file connection, while in code `link b = a` is a reference. This is the order the language suggests using.

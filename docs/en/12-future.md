@@ -4,10 +4,6 @@
 
 An iterator as a language entity is not needed: it requires values with state, which are banned in this language (`sub` is not a value, links are not hidden in closures). But its speed is required: going through a "plain loop" must not lose to an iterator, as it does in other languages.
 
-## Principle
-
-> Iterator speed is a property of the compiler, not a language entity.
-
 Why iterators in Rust beat "plain loops" at all — three things the compiler does with iterator code after inlining: removes bounds checks (the cursor has an honest range, overflow is excluded by construction), removes indirection (next() replaced by an index increment), turns write-read-write into a straight pipeline with no intermediate allocations. Adapters like map/filter are just a way to *express* all this so the compiler sees the whole chain at once. A `while` loses to an iterator exactly on these points: nothing says `n` will not change, `i` will not overflow, `a[i]` will not go out of bounds.
 
 ## Lowering rules
@@ -25,10 +21,6 @@ for w in list.windows(3) { ... }              // sliding window = cursor with of
 Sugar, not entities: the forms have no values, no state, they cannot be stored or passed. Their expansion is visible, like `!`-forms (see 02-syntax.md).
 
 4. The check for mutating the container inside the body — the existing link-kill rules: if the container is mutated, len/index is re-read and the loop honestly rechecks. The programmer does not pay for the case that did not happen.
-
-## The point
-
-"If it can be faster, it is faster" — achieved dogmatically simply: the user does not choose between a "simple" and a "fast" loop because the slow form does not exist in the language — it dissolves at lowering. The only thing that can bring it back is mutating the container mid-iteration, and that is an honest price the language states plainly with the "change kills the link" rule.
 
 ## Indices as the primary mechanism for heap access
 
@@ -65,8 +57,6 @@ The label ties the index to the container and is checked at boundaries; it is er
 - the label = "which container";
 - the life of the container itself is covered by the existing analysis.
 
-So: type label = "which container", lifetime analysis = "container is alive". Lifetimes were not needed.
-
 The pointer-caching rule is not a separate feature but a consequence of existing rules:
 
 > An index checked at least once in a region where the container is frozen (`link*`) or provably immutable is equivalent to a direct pointer and may be cached by the compiler. Any mutation of the container kills both the freeze and the cached pointers — like an ordinary link kill.
@@ -93,8 +83,6 @@ The rule: squeeze the maximum, but if it gets too complicated — drop it. The l
 - Removal from non-stable containers: one option is generational indices (index + generation packed into one 64-bit value), the slot is not reused immediately; a natural extension of `i32:id`.
 - Indices are not for everything: value data (stack, struct fields) is statically checked already — do not force indices there. Indices replace exactly the class where pointers used to be and where the bans were: link chains, links hidden in containers — what could not be done with a link is done with a checked index.
 
-## Explicit size at vector creation — not in v1
-
 When a container is created, the allocation size is mandatory to write down — in objects, not in bytes:
 
 ```text
@@ -109,8 +97,6 @@ Rules:
 - the vector mechanics do not change: `none` is the current behavior (empty + gradual allocation); an explicit number is a capacity claim, not a contract;
 - if there turn out to be more actual objects than claimed — the vector grows as usual, that is not an error;
 - both modes are written in one place: know the size — pay one exact allocation and see it in the code; don't know — get gradual growth honestly.
-
-The point: vector creation is the moment an allocation is born, and writing the size confirms the programmer knows this. Over-allocation is visible by eye in the code — no benchmark or profiler is needed to figure out that somebody reserved ten times more than they use.
 
 ## Blueprints — not in v1
 

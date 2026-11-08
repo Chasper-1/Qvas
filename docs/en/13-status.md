@@ -2,7 +2,7 @@
 
 ## Stage
 
-**Status refers to the language *concept*, not code: the compiler is not written, none of the examples below run.** Implementation progress lives in [TODO.md](../../TODO.md).
+Status refers to the language *concept*, not code: the compiler is not written, none of the examples below run. Implementation progress lives in [TODO.md](../../TODO.md).
 
 The core concept is decided. Parallelism: the mechanism is solved — a dependency graph from the written order, node routing by entity (`fn` → rayon, `sub` → tokio), execution via existing schedulers. By blocks:
 
@@ -24,11 +24,7 @@ The core concept is decided. Parallelism: the mechanism is solved — a dependen
 
 What is closed: the language core, basic syntax, ecosystem, error messages, scopes, parallelism (concept and mechanism).
 
-**Again: everything that sounds like "decided" or "closed" is about the concept (the spec), not the compiler. There is no working code.**
-
 ## What is decided by blocks
-
-*(Concept — not code.)*
 
 - **Types** — static, 100%. Numeric: `i8/i16/i32/i64`, `u8/u16/u32/u64`, `f32/f64`; `bool`, `str`. `str` is a sequence of characters: `s[i]` → a `str` of one character, `.len` — the number of characters; there is no `char` and no `String`, byte access — later. Lengths and indices — `i32`, no `usize/isize`. Labels `i32:id` — a refinement of a value, not a new type; `i32:=id` — a binding to a source variable.
 - **Structs** — a way to assemble several different values into one, accessed by field name.
@@ -69,9 +65,6 @@ Principle: do not cut functionality. What we do not build in v1, we design so th
 
 - Enum in the config — single backticks `` `...` ``.
 - Config format: strings `""`, numbers `''`, arrays `{}`, tables `[]`, enum `` `...` ``.
-- Comments — `//`.
-- Overflow — always a warning, release/debug makes no difference. Suppression — `no_warn`.
-- `no_warn` — a prefix modifier before an operator/expression/declaration: suppresses warnings from the thing it stands before. Errors cannot be suppressed.
 
 ## Next
 

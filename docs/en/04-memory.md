@@ -21,18 +21,6 @@ ignore!(print(b))  // last use of the data
 
 Referring to something that does not exist is impossible by definition. If the slot's death is provable, it is a compile error. For `link&` the slot can disappear only at runtime (for example, an element is removed from a container) — then the compiler inserts a slot-existence check, and failure of the check is a panic, not UB.
 
-## Why automatic management
-
-The programmer should not have to think about memory when it already works deterministically. Manual allocation requires knowing exactly where memory is needed, and a mistake there is a logic error the compiler does not catch.
-
-Automatic management + reference checking give:
-
-- predictable behavior — freeing at the point of last use, without pauses or a collector;
-- simple checks — lifetime analysis is needed for reference checking anyway, inserting `free` is free;
-- memory safety — the compiler itself decides where to allocate and when to free.
-
-The goal of the language is not to let you shoot yourself in the foot while writing. The compiler catches obvious errors at compile time and manages memory itself.
-
 ## Move and copy
 
 `let b = a` is always a copy (the programmer's explicit intent). `box(a)` — the compiler decides copy or move.
@@ -44,6 +32,6 @@ The rule for `box`:
 
 Only **consuming** uses (`box`) are counted. Readings through references (`link`) are not counted — you can read as many times as you like, that is not consumption.
 
-This is passing, not ownership. Ownership is passing plus a lot of extra. Passing is passing, no more and no less: the responsible name changes, the old name is dead, the memory does not move. References to it die together with the old name.
+This is passing, not ownership: the responsible name changes, the old name is dead, the memory does not move. References to it die together with the old name.
 
 For large objects a copy can be expensive; the optimizer may turn safe copies into moves, but the decision is made by the compiler, not the programmer.
