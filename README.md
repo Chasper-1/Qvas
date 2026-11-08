@@ -41,17 +41,17 @@ sub main() {
 
 ## Документация
 
-- [docs/ru/01-overview.md](docs/ru/01-overview.md) — обзор: цели
-- [docs/ru/02-syntax.md](docs/ru/02-syntax.md) — синтаксис: ключевые слова, переменные, вычисления и действия, условия, циклы, зоны
-- [docs/ru/03-data-model.md](docs/ru/03-data-model.md) — модель данных: копия, ссылки, box, контракты операций
-- [docs/ru/04-memory.md](docs/ru/04-memory.md) — память: автоматическое управление, move/копия
-- [docs/ru/05-references.md](docs/ru/05-references.md) — проверка ссылок: три правила, CFG, формат ошибок
-- [docs/ru/06-parallelism.md](docs/ru/06-parallelism.md) — параллелизм: `parallel { ... }`, граф зависимостей
-- [docs/ru/07-functions.md](docs/ru/07-functions.md) — вычисления и действия: контракт, мутация, значения
-- [docs/ru/08-types.md](docs/ru/08-types.md) — типы: статические, числовые, метки `i32:id`, источники `i32:=id`
-- [docs/ru/09-modules.md](docs/ru/09-modules.md) — модули: `use std`, `link file`, области видимости
-- [docs/ru/10-errors.md](docs/ru/10-errors.md) — обработка ошибок: `T or E`, явный `switch`, `defer`, режимы ошибок
-- [docs/ru/11-compiler.md](docs/ru/11-compiler.md) — компилятор: Cranelift, IR (SSA), плоский AST
-- [docs/ru/12-future.md](docs/ru/12-future.md) — идеи на будущее: JIT, comptime, self-hosting
-- [docs/ru/13-status.md](docs/ru/13-status.md) — статус: концепция описана, реализация пока не готова
-- [docs/ru/14-examples.md](docs/ru/14-examples.md) — примеры: калькулятор и парсер рекурсивного спуска с разбором по шагам
+- [01-overview.md](docs/ru/01-overview.md) — обзор: цели
+- [02-syntax.md](docs/ru/02-syntax.md) — синтаксис: ключевые слова, переменные, вычисления и действия, условия, циклы, зоны
+- [03-data-model.md](docs/ru/03-data-model.md) — модель данных: копия, ссылки, box, контракты операций
+- [04-memory.md](docs/ru/04-memory.md) — память: автоматическое управление, move/копия
+- [05-references.md](docs/ru/05-references.md) — проверка ссылок: три правила, CFG, формат ошибок
+- [06-parallelism.md](docs/ru/06-parallelism.md) — параллелизм: `parallel { ... }`, граф зависимостей
+- [07-functions.md](docs/ru/07-functions.md) — вычисления и действия: контракт, мутация, значения
+- [08-types.md](docs/ru/08-types.md) — типы: статические, числовые, метки `i32:id`, источники `i32:=id`
+- [09-modules.md](docs/ru/09-modules.md) — модули: `use std`, `link file`, области видимости
+- [10-errors.md](docs/ru/10-errors.md) — обработка ошибок: `T or E`, явный `switch`, `defer`, режимы ошибок
+- [11-compiler.md](docs/ru/11-compiler.md) — компилятор: Cranelift, IR (SSA), плоский AST
+- [12-future.md](docs/ru/12-future.md) — идеи на будущее: JIT, comptime, self-hosting
+- [13-status.md](docs/ru/13-status.md) — статус: концепция описана, реализация пока не готова
+- [14-examples.md](docs/ru/14-examples.md) — примеры: калькулятор и парсер рекурсивного спуска с разбором по шагам
